@@ -146,27 +146,13 @@ public class Demo_java_api {
     @Test
     public void getUserAddress() throws Exception {
         HashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("method", "getRechargeAddress");
+        paramMap.put("method", "getUserAddress");
         paramMap.put("accesskey", accessKey);
         paramMap.put("currency", "btc");
         signUp(paramMap);
         String result = restTemplate.getForObject(domainUrl + "getUserAddress?method={method}" +
                 "&accesskey={accesskey}&currency={currency}" +
                 "&sign={sign}&reqTime={reqTime}", String.class, paramMap);
-        System.out.println(result);
-    }
-
-    @Test
-    public void getWithdrawAddress() throws Exception {
-        HashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("method", "getWithdrawAddress");
-        paramMap.put("accesskey", accessKey);
-        paramMap.put("currency", "btc");
-        signUp(paramMap);
-        String result = restTemplate.getForObject(domainUrl + "getWithdrawAddress?method={method}" +
-                "&accesskey={accesskey}&currency={currency}" +
-                "&sign={sign}&reqTime={reqTime}", String.class, paramMap);
-
         System.out.println(result);
     }
 
@@ -219,49 +205,7 @@ public class Demo_java_api {
         System.out.println(result);
     }
 
-    /**
-     * 获取人民币提现记录
-     * method:固定值，写getCnyWithdrawRecord就好
-     * accesskey:自己的accesskey
-     * pageIndex:第几页
-     * pageSize:每页有多少条数据
-     * @throws Exception
-     */
-    @Test
-    public void getCnyWithdrawRecord() throws Exception {
-        HashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("method", "getCnyWithdrawRecord");
-        paramMap.put("accesskey", accessKey);
-        paramMap.put("pageIndex", 1);
-        paramMap.put("pageSize", 40);
-        signUp(paramMap);
-        String result = restTemplate.getForObject(domainUrl + "getCnyWithdrawRecord?method={method}" +
-                "&accesskey={accesskey}&pageIndex={pageIndex}&pageSize={pageSize}" +
-                "&sign={sign}&reqTime={reqTime}", String.class, paramMap);
-        System.out.println(result);
-    }
-
-    /**
-     * 获取人民币充值记录
-     * method:固定值，写getCnyChargeRecord就好
-     * accesskey:自己的accesskey
-     * pageIndex:第几页
-     * pageSize:每页有多少条数据
-     * @throws Exception
-     */
-    @Test
-    public void getCnyChargeRecord() throws Exception {
-        HashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("method", "getCnyRechargeRecord");
-        paramMap.put("accesskey", accessKey);
-        paramMap.put("pageIndex", 1);
-        paramMap.put("pageSize", 40);
-        signUp(paramMap);
-        String result = restTemplate.getForObject(domainUrl + "getCnyChargeRecord?method={method}" +
-                "&accesskey={accesskey}&pageIndex={pageIndex}&pageSize={pageSize}" +
-                "&sign={sign}&reqTime={reqTime}", String.class, paramMap);
-        System.out.println(result);
-    }
+    
 
     @Test
     public void withdraw() throws Exception {
@@ -271,11 +215,11 @@ public class Demo_java_api {
         paramMap.put("currency", "etc");
         paramMap.put("fees", "1");
         paramMap.put("method", "withdraw");
-        paramMap.put("receiveAddr", "0x992c9dc9c0bcffa42f69b98d53800c1748febaa9");
+        paramMap.put("receiveAddress", "0x992c9dc9c0bcffa42f69b98d53800c1748febaa9");
         paramMap.put("safePwd", "123456qq");
         signUp(paramMap);
         String result = restTemplate.getForObject(domainUrl + "withdraw?" +
-                "accesskey={accesskey}&amount={amount}&currency={currency}&fees={fees}&method={method}&receiveAddr={receiveAddr}&safePwd={safePwd}" +
+                "accesskey={accesskey}&amount={amount}&currency={currency}&fees={fees}&method={method}&receiveAddress={receiveAddress}" +
                 "&sign={sign}&reqTime={reqTime}", String.class, paramMap);
         System.out.println(result);
     }
