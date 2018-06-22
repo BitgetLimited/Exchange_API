@@ -150,7 +150,7 @@ class Client_BitGet():
 
 #################################行情类接口 start##################
 
-    #
+    #行情
     def ticker(self,currency):
         currency = currency.lower()
         if 'usd' in currency:
@@ -159,7 +159,7 @@ class Client_BitGet():
         resp = self.signedRequest_Market(path='/ticker', params=params)
         return resp
 
-    #
+    #市场深度
     def depth(self,currency,size,merge):
         currency = currency.lower()
         if 'usd' in currency:
@@ -168,7 +168,7 @@ class Client_BitGet():
         resp = self.signedRequest_Market(path='/depth', params=params)
         return resp
 
-    #
+    #历史成交
     def trades(self, currency):
         currency = currency.lower()
         if 'usd' in currency:
