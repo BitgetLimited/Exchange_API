@@ -32,13 +32,6 @@ public class DataDemo {
     }
 
     
-    public static void ticker(){
-        String method = "/data/v1/ticker?symbol=btc_usdt";
-        String s = get(method);
-        System.out.println(s);
-    }
-
-    
     public static void merged(){
         String method = "/data/v1/market/detail/merged?symbol=btc_usdt";
         String s = get(method);
