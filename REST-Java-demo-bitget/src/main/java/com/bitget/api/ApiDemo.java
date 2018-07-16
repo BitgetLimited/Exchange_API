@@ -17,8 +17,8 @@ public class ApiDemo {
 
     private static String domainUrl = "https://api.bitget.com/api/v1";
 
-    private static String accessKey = "ake123442c0";
-    private static String secretKey = "53736212912385sdf22bc4d4e7b260b9";
+    private static String accessKey = "ake6612c38d442c0";
+    private static String secretKey = "537362121222bc4d4e7b260b9";
 
 
     static final int CONN_TIMEOUT = 50;
@@ -31,7 +31,7 @@ public class ApiDemo {
                 .build();
     }
     public static void main(String[] args) throws Exception {
-        accounts();
+        withdrawSelect();
     }
     /**
      * 获取个人ID
@@ -40,7 +40,7 @@ public class ApiDemo {
     public static void accounts(){
         HashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("accesskey", accessKey);
-        signUp(paramMap);
+        signUp(paramMap,"get");
         String method = "/account/accounts?";
         String s = get(method,paramMap);
         System.out.println(s);
@@ -53,8 +53,9 @@ public class ApiDemo {
     public static void balance() throws IOException{
         HashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("accesskey", accessKey);
-        signUp(paramMap);
-        String method = "/accounts/390123256960/balance?";
+        signUp(paramMap,"get");
+
+        String method = "/accounts/3902344889256960/balance?";
         String s = get(method,paramMap);
         System.out.println(s);
     }
@@ -65,38 +66,38 @@ public class ApiDemo {
      */
 
     public static void place() throws IOException {
-        HashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("account_id","391239256960");
-        paramMap.put("amount","1");
-        paramMap.put("price","0.03");
-        paramMap.put("type","buy-limit");
-        paramMap.put("symbol","iost_usdt");
+        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("accesskey",accessKey);
+        paramMap.put("account_id","390323889256960");
+        paramMap.put("amount","10");
+        //paramMap.put("price","0.03");
+        paramMap.put("type","buy-market");
+        paramMap.put("symbol","iost_btc");
         paramMap.put("method","place");
-        signUp(paramMap);
+        String signs = signUp(paramMap,"post");
         String method = "/order/orders/place";
-        String s = post(method,paramMap);
+        String s = post(method,paramMap,signs);
         System.out.println(s);
     }
 
 
     public static void submitcancel(){
-        HashMap<String, Object> paramMap = new LinkedHashMap();
+        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("accesskey",accessKey);
-        signUp(paramMap);
-        String method = "/order/orders/40121232880256/submitcancel";
-        String s = post(method,paramMap);
+        String signs = signUp(paramMap,"post");
+        String method = "/order/orders/40258239144310784/submitcancel";
+        String s = post(method,paramMap,signs);
         System.out.println(s);
     }
 
-    private static String post(String method,HashMap<String, Object> paramMap){
+    private static String post(String method,LinkedHashMap<String, Object> paramMap,String signs){
         try{
             FormBody.Builder formBodyBuilder = new FormBody.Builder();
-            for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
+            for (HashMap.Entry<String, Object> entry : paramMap.entrySet()) {
                 formBodyBuilder.add(entry.getKey(), String.valueOf(entry.getValue()));
             }
             RequestBody body = formBodyBuilder.build();
-            Request.Builder builder = new Request.Builder().url(domainUrl + method).post(body);
+            Request.Builder builder = new Request.Builder().url(domainUrl + method +"?"+signs).post(body);
             Request request = builder.build();
             Response response = client.newCall(request).execute();
             String s = response.body().string();
@@ -120,16 +121,16 @@ public class ApiDemo {
 
     public static void batchcancel(){
         List list = new ArrayList();
-        list.add("4012822346524288");
-        list.add("40128212342110080");
-        list.add("4012822349185280");
-        HashMap<String, Object> paramMap = new LinkedHashMap();
+        list.add("4025823740775620608");
+        list.add("401282232342110080");
+        list.add("4012343349185280");
+        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("accesskey",accessKey);
         paramMap.put("order_ids", list);
-        signUp(paramMap);
+        String signs = signUp(paramMap,"post");
         String method = "/order/orders/batchcancel";
-            String s = post(method,paramMap);
-            System.out.println(s);
+        String s = post(method,paramMap,signs);
+        System.out.println(s);
 
     }
     /**
@@ -138,12 +139,12 @@ public class ApiDemo {
      */
 
     public static void order() throws IOException{
-        HashMap<String, Object> paramMap = new LinkedHashMap();
+        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("accesskey",accessKey);
-        signUp(paramMap);
-        String method = "/order/orders/40122340569185280";
-            String s = post(method,paramMap);
-            System.out.println(s);
+        String signs = signUp(paramMap,"post");
+        String method = "/order/orders/4012223569185280";
+        String s = post(method,paramMap,signs);
+        System.out.println(s);
 
     }
     /**
@@ -152,18 +153,18 @@ public class ApiDemo {
      */
      // TODO 不通
     public static void matchresults(){
-        HashMap<String, Object> paramMap = new LinkedHashMap();
+        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("accesskey",accessKey);
-        signUp(paramMap);
-        String method = "/order/orders/401212387692032/matchresults";
-            String s = post(method,paramMap);
-            System.out.println(s);
+        String signs = signUp(paramMap,"post");
+        String method = "/order/orders/401212334032/matchresults";
+        String s = post(method,paramMap,signs);
+        System.out.println(s);
     }
 
 
 
     public static void matchresultsHistory(){
-        HashMap<String, Object> paramMap = new LinkedHashMap();
+        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("method","matchresults");
         paramMap.put("accesskey",accessKey);
         paramMap.put("symbol","iost_usdt");
@@ -174,10 +175,10 @@ public class ApiDemo {
         paramMap.put("size","50");
         paramMap.put("from","401234880256");
         paramMap.put("direct","next");
-        signUp(paramMap);
+        String signs = signUp(paramMap,"post");
         String method = "/order/matchresults";
-            String s = post(method,paramMap);
-            System.out.println(s);
+        String s = post(method,paramMap,signs);
+        System.out.println(s);
     }
 
 
@@ -199,7 +200,7 @@ public class ApiDemo {
         paramMap.put("size","50");
         paramMap.put("from","40122342880256");
         paramMap.put("direct", "prev");
-        signUp(paramMap);
+        signUp(paramMap,"get");
         String method = "/order/orders?";
             String s = get(method,paramMap);
             System.out.println(s);
@@ -207,28 +208,28 @@ public class ApiDemo {
 
 
     public static void withdrawCreate(){
-        HashMap<String, Object> paramMap = new LinkedHashMap();
+        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("method","withdrawCreate");
         paramMap.put("accesskey",accessKey);
         paramMap.put("address","1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi");
         paramMap.put("amount","10");
         paramMap.put("currency","btc");
         paramMap.put("fees","0.1");
-        signUp(paramMap);
+        String signs = signUp(paramMap,"post");
         String method = "/dw/withdraw/api/create";
-            String s = post(method,paramMap);
-            System.out.println(s);
+        String s = post(method,paramMap,signs);
+        System.out.println(s);
     }
 
     //191
     public static void withdrawCancel(){
-        HashMap<String, Object> paramMap = new LinkedHashMap();
+        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("method", "withdrawCancel");
         paramMap.put("accesskey", accessKey);
-        signUp(paramMap);
-        String method = "/dw/withdraw-virtual/234123/cancel";
-            String s = post(method,paramMap);
-            System.out.println(s);
+        String signs = signUp(paramMap,"post");
+        String method = "/dw/withdraw-virtual/22226/cancel";
+        String s = post(method,paramMap,signs);
+        System.out.println(s);
     }
 
 
@@ -239,7 +240,7 @@ public class ApiDemo {
         paramMap.put("currency","btc");
         paramMap.put("type","withdraw");
         paramMap.put("size","10");
-        signUp(paramMap);
+        signUp(paramMap,"get");
         String method = "/order/deposit_withdraw?";
             String s = get(method,paramMap);
             System.out.println(s);
@@ -275,7 +276,7 @@ public class ApiDemo {
         return rc.toString();
     }
 
-    private static void signUp(HashMap paramMap) {
+    private static String signUp(HashMap paramMap,String methodReq) {
         try {
             //先进行数据的转换
             String params = signUpParam(paramMap);
@@ -283,12 +284,23 @@ public class ApiDemo {
             String secret = digest(secretKey);
             //在将要加密的数据和加密后的secretKey进行hmac加密
             String sign = sign(params, secret);
-            paramMap.put("sign", sign);
+            //paramMap.put("sign", sign);
             long req_time = System.currentTimeMillis();
-            paramMap.put("req_time", req_time);
+            //paramMap.put("req_time", req_time);
+            if("get".equals(methodReq)){
+                //paramMap.put("accesskey",accessKey);
+                paramMap.put("sign", sign);
+                paramMap.put("req_time", req_time);
+                System.out.println(params+"&sign="+sign+"&req_time="+req_time);
+                return "";
+            }else{
+                return "sign="+sign+"&req_time="+req_time;
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
+            return "";
         }
+
     }
 
     public static String signUpParam(HashMap<String, Object> paramMap) {
