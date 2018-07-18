@@ -15,7 +15,7 @@ except:
 #行情类接口
 BASE_API_PUBLIC = 'https://api.bitget.com/data/v1'
 #交易类接口
-BASE_API_TRADE = 'https://api.bitget.com/api/v1'
+BASE_API_TRADE = 'http://api.bitget.com/api/v1'
 
 headers = {
             "Content-type": "application/x-www-form-urlencoded",
@@ -30,10 +30,11 @@ class Client_BitGet():
         self.adapter = requests.adapters.HTTPAdapter(pool_connections=5,
                                                      pool_maxsize=5, max_retries=5)
         self.sessn.mount('http://', self.adapter)
-        self.sessn.mount('http://', self.adapter)
+        self.sessn.mount('https://', self.adapter)
         self.order_list = []
 
     def http_post_request(self,url, params, add_to_headers=None):
+        print(params)
         if add_to_headers:
             headers.update(add_to_headers)
         response = requests.post(url=url, data=params, headers=headers, timeout=30)
@@ -54,8 +55,9 @@ class Client_BitGet():
 
     #交易类接口方法
     def signedRequest_Trade(self, path, params, reqMethod):
+        print(params)
         param = ''
-        for key in sorted(params.keys()):
+        for key in params.keys():
             param += key + '=' + str(params.get(key)) + '&'
         param = param.rstrip('&')
         print("param="+param)
@@ -73,7 +75,8 @@ class Client_BitGet():
         if(reqMethod == 'post'):
             #将加密信息与请求参数分开
             print(reqMethod)
-            url = BASE_API_TRADE + path + '?sign=' + signature + '&req_time='+reqTime[0] + "&accesskey="+self._public_key
+            url = BASE_API_TRADE + path + '?sign=' + signature + '&req_time='+reqTime[0]+"&accesskey="+self._public_key
+            print(params)
             return self.http_post_request(url=url, params=params)
 
 
@@ -107,7 +110,7 @@ class Client_BitGet():
 
 
     #委单
-    def place(self,account_id,amount,types,symbol):
+    def place(self,account_id,amount,types,symbol,price):
         '''
             获取多个委托买单或卖单，每次请求返回10条记录
             side: 可选 buy 1 /sell 0
@@ -119,9 +122,11 @@ class Client_BitGet():
         params = {
             'account_id': account_id,
             'amount': amount,
+            #'price' : price,
             'symbol': symbol,
             'type': types}
-        print(self._public_key)
+        if price:
+            params["price"] = price
         resp = self.signedRequest_Trade(path='/order/orders/place',params=params, reqMethod='post')
         return resp
 
@@ -293,21 +298,20 @@ class Client_BitGet():
 
 #################################行情类接口 end##################
 
-apikey = 'ake661c38d442c0'
-secretkey = '5373622734285922bc4d4e7b260b9'
+apikey = 'ak9bf3fd12d0044c6'
+secretkey = '2a72d83b0ca1284a5ba5c6a6dafc2'
 client = Client_BitGet(apikey,secretkey)
 
 ####order start######
 #交易对类型，请填写系统所支持的交易对，例：IOST/BTC 写成：iost_btc
 account_id='3903501889256960'
 symbol = 'eth_btc'
-#交易类型，0(buy)/1(sell)
-types = 'buy-market'
+types = 'buy-limit'
 #单价
-#price = '0.009'
+price = '0.009'
 #要买或卖的数量
-amount = '1'
-respJson = client.place(account_id,amount,types,symbol)
+amount = '10'
+respJson = client.place(account_id,amount,types,symbol,price)
 print(respJson)
 ####order end######
 
