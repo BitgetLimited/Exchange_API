@@ -1,26 +1,37 @@
 var config = require('config');
-const hbsdk = require('./sdk/hbsdk');
+const bgsdk = require('./sdk/bgsdk');
 
 function run() {
 
+    //bgsdk.accounts(config.bitget.access_key).then(console.log);
+    //bgsdk.balance(config.bitget.access_key,'390350274889256960').then(console.log);
+    //accesskey,account_id,amount,price,symbol,type
+    //bgsdk.place(config.bitget.access_key,'390350274889256960','10','0.003','eth_btc','buy-limit');
+    //bgsdk.submitcancel(config.bitget.access_key,'403385175360188416');
+    //bgsdk.order(config.bitget.access_key,'403385175360188416');
+    //bgsdk.matchresults(config.bitget.access_key,'403385175360188416');
+    //symbol,types,start_date,end_date,states,size,fromId,direct)
+    //bgsdk.matchresultsHistory(config.bitget.access_key,'eth_btc','sell-market','2018-06-01','2018-07-20','submitted','50','403041397436887040','next');
+    //bgsdk.orders(config.bitget.access_key,'eth_btc','sell-market','2018-06-01','2018-07-20','submitted','50','','');
+    //addressWithdraw,amount,currency,fees
+    //bgsdk.withdrawCreate(config.bitget.access_key,'1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi','10','btc','0.001');
+    //bgsdk.withdrawCancel(config.bitget.access_key,'261');
 
-    //hbsdk.getOrders(config.bitget.access_key,'0','iost_btc','1','40').then(console.log);
-    //hbsdk.getWithdrawRecord(config.bitget.access_key,'btc','1','40').then(console.log);
-    //hbsdk.getChargeRecord(config.bitget.access_key,'btc','1','40').then(console.log);
-    //hbsdk.order(config.bitget.access_key,'0.002','1','0','iost_btc').then(console.log);
-    //hbsdk.cancel(config.bitget.access_key,'395131275125002600','iost_btc').then(console.log);
-    //hbsdk.getOrder(config.bitget.access_key,'3951311235002600','iost_btc').then(console.log);
-    //hbsdk.getAccountInfo(config.bitget.access_key).then(console.log);
-    //hbsdk.getUserAddress(config.bitget.access_key,'btc').then(console.log);
-    //hbsdk.withdraw(config.bitget.access_key,'2','btc','1','1PaHiYCBF1212xB4n99CaDNYi').then(console.log);
+    bgsdk.withdrawSelect(config.bitget.access_key,'btc','withdraw','10');
 
 
 
 
-    //hbsdk.ticker('iost_btc').then(console.log);
-    //hbsdk.depth('iost_btc','20','0.01').then(console.log);
-    //hbsdk.trades('iost_btc').then(console.log);
-    //hbsdk.kline('iost_btc','0','1').then(console.log);
+    // bgsdk.kline('iost_btc','1min','1').then(console.log);
+    // bgsdk.merged('iost_btc').then(console.log);
+    // bgsdk.ticckers().then(console.log);
+    // bgsdk.depth('iost_btc','step1').then(console.log);
+    // bgsdk.trade('iost_btc').then(console.log);
+    // bgsdk.trades('iost_btc','10').then(console.log);
+    // bgsdk.detail('iost_btc').then(console.log);
+    // bgsdk.symbols().then(console.log);
+    // bgsdk.currencys().then(console.log);
+    // bgsdk.timestamp().then(console.log);
 
 
 }

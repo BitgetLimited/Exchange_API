@@ -17,8 +17,8 @@ public class ApiDemo {
 
     private static String domainUrl = "https://api.bitget.com/api/v1";
 
-    private static String accessKey = "ake6612c38d442c0";
-    private static String secretKey = "537362121222bc4d4e7b260b9";
+    private static String accessKey = "ake128d442c0";
+    private static String secretKey = "5373621212c4d4e7b260b9";
 
 
     static final int CONN_TIMEOUT = 50;
@@ -39,7 +39,7 @@ public class ApiDemo {
 
     public static void accounts(){
         HashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("accesskey", accessKey);
+        paramMap.put("method", "accounts");
         signUp(paramMap,"get");
         String method = "/account/accounts?";
         String s = get(method,paramMap);
@@ -52,10 +52,10 @@ public class ApiDemo {
 
     public static void balance() throws IOException{
         HashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("accesskey", accessKey);
+        paramMap.put("method", "balance");
         signUp(paramMap,"get");
 
-        String method = "/accounts/3902344889256960/balance?";
+        String method = "/accounts/390350274889256960/balance?";
         String s = get(method,paramMap);
         System.out.println(s);
     }
@@ -67,25 +67,26 @@ public class ApiDemo {
 
     public static void place() throws IOException {
         LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("accesskey",accessKey);
-        paramMap.put("account_id","390323889256960");
+        paramMap.put("account_id","3903502189256960");
         paramMap.put("amount","10");
-        //paramMap.put("price","0.03");
-        paramMap.put("type","buy-market");
-        paramMap.put("symbol","iost_btc");
+        paramMap.put("price","0.003");//402631028969091072
         paramMap.put("method","place");
+        paramMap.put("symbol","iost_eth");
+        paramMap.put("type","sell-limit");
+
         String signs = signUp(paramMap,"post");
         String method = "/order/orders/place";
+        System.out.println(signs);
         String s = post(method,paramMap,signs);
         System.out.println(s);
     }
 
-
+    //取消委单
     public static void submitcancel(){
         LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("accesskey",accessKey);
+        paramMap.put("method","submitcancel");
         String signs = signUp(paramMap,"post");
-        String method = "/order/orders/40258239144310784/submitcancel";
+        String method = "/order/orders/40258159144310784/submitcancel";
         String s = post(method,paramMap,signs);
         System.out.println(s);
     }
@@ -97,10 +98,15 @@ public class ApiDemo {
                 formBodyBuilder.add(entry.getKey(), String.valueOf(entry.getValue()));
             }
             RequestBody body = formBodyBuilder.build();
+
             Request.Builder builder = new Request.Builder().url(domainUrl + method +"?"+signs).post(body);
             Request request = builder.build();
+
             Response response = client.newCall(request).execute();
+
             String s = response.body().string();
+            System.out.println("1");
+            System.err.println(s);
             return s;
         }catch (IOException e) {
             return ApiReturnResult.error(ErrorCodeConstant.BAD_REQUEST, ErrorCodeConstant.INVALID_PARAMETER).toJsonString();
@@ -119,13 +125,14 @@ public class ApiDemo {
         }
     }
 
+    //批量撤销委单
     public static void batchcancel(){
         List list = new ArrayList();
-        list.add("4025823740775620608");
-        list.add("401282232342110080");
-        list.add("4012343349185280");
+        list.add("402588740775620608");
+        list.add("40128212342110080");
+        list.add("4012822349185280");
         LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("accesskey",accessKey);
+        paramMap.put("method","batchcancel");
         paramMap.put("order_ids", list);
         String signs = signUp(paramMap,"post");
         String method = "/order/orders/batchcancel";
@@ -140,9 +147,9 @@ public class ApiDemo {
 
     public static void order() throws IOException{
         LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("accesskey",accessKey);
+        paramMap.put("method","order");
         String signs = signUp(paramMap,"post");
-        String method = "/order/orders/4012223569185280";
+        String method = "/order/orders/40263051769176064";
         String s = post(method,paramMap,signs);
         System.out.println(s);
 
@@ -151,29 +158,28 @@ public class ApiDemo {
      * 查询某个订单的成交明细
      * return
      */
-     // TODO 不通
+    //
     public static void matchresults(){
         LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("accesskey",accessKey);
+        paramMap.put("method","orderMatchresults");
         String signs = signUp(paramMap,"post");
-        String method = "/order/orders/401212334032/matchresults";
+        String method = "/order/orders/402630547769176064/matchresults";
         String s = post(method,paramMap,signs);
         System.out.println(s);
     }
 
 
-
+    //查询历史委单
     public static void matchresultsHistory(){
         LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("method","matchresults");
-        paramMap.put("accesskey",accessKey);
-        paramMap.put("symbol","iost_usdt");
-        paramMap.put("types","buy-market");
+        paramMap.put("symbol","eth_btc");
+        paramMap.put("types","sell-market");
         paramMap.put("start_date","2018-06-01");
-        paramMap.put("end_date","2018-07-12");
+        paramMap.put("end_date","2018-07-19");
         paramMap.put("states","submitted");
         paramMap.put("size","50");
-        paramMap.put("from","401234880256");
+        paramMap.put("from","402954178734895104");
         paramMap.put("direct","next");
         String signs = signUp(paramMap,"post");
         String method = "/order/matchresults";
@@ -191,26 +197,24 @@ public class ApiDemo {
     public static void orders(){
         HashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("method","orders");
-        paramMap.put("accesskey",accessKey);
-        paramMap.put("symbol","iost_usdt");
-        paramMap.put("types","buy-market");
+        paramMap.put("symbol","eth_btc");
+        paramMap.put("types","buy-limit");
         paramMap.put("start_date","2018-06-01");
-        paramMap.put("end_date","2018-07-12");
+        paramMap.put("end_date","2018-07-19");
         paramMap.put("states","submitted");
         paramMap.put("size","50");
-        paramMap.put("from","40122342880256");
-        paramMap.put("direct", "prev");
+        paramMap.put("from","401608425894621184");
+        paramMap.put("direct", "next");
         signUp(paramMap,"get");
         String method = "/order/orders?";
-            String s = get(method,paramMap);
-            System.out.println(s);
+        String s = get(method,paramMap);
+        System.out.println(s);
     }
 
-
+    //提现
     public static void withdrawCreate(){
         LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("method","withdrawCreate");
-        paramMap.put("accesskey",accessKey);
         paramMap.put("address","1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi");
         paramMap.put("amount","10");
         paramMap.put("currency","btc");
@@ -221,31 +225,28 @@ public class ApiDemo {
         System.out.println(s);
     }
 
-    //191
+    //取消提现
     public static void withdrawCancel(){
         LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("method", "withdrawCancel");
-        paramMap.put("accesskey", accessKey);
         String signs = signUp(paramMap,"post");
-        String method = "/dw/withdraw-virtual/22226/cancel";
+        String method = "/dw/withdraw-virtual/226/cancel";
         String s = post(method,paramMap,signs);
         System.out.println(s);
     }
 
-
+    //查询提现记录
     public static void withdrawSelect(){
         HashMap<String, Object> paramMap = new LinkedHashMap();
         paramMap.put("method","withdrawSelect");
-        paramMap.put("accesskey",accessKey);
         paramMap.put("currency","btc");
         paramMap.put("type","withdraw");
         paramMap.put("size","10");
         signUp(paramMap,"get");
         String method = "/order/deposit_withdraw?";
-            String s = get(method,paramMap);
-            System.out.println(s);
+        String s = get(method,paramMap);
+        System.out.println(s);
     }
-
 
 
 
@@ -288,13 +289,16 @@ public class ApiDemo {
             long req_time = System.currentTimeMillis();
             //paramMap.put("req_time", req_time);
             if("get".equals(methodReq)){
+                System.out.println("get");
                 //paramMap.put("accesskey",accessKey);
                 paramMap.put("sign", sign);
                 paramMap.put("req_time", req_time);
-                System.out.println(params+"&sign="+sign+"&req_time="+req_time);
+                paramMap.put("accesskey",accessKey);
+                System.out.println(params+"&sign="+sign+"&req_time="+req_time+"&accesskey="+accessKey);
                 return "";
             }else{
-                return "sign="+sign+"&req_time="+req_time;
+                System.out.println("post");
+                return "sign="+sign+"&req_time="+req_time+"&accesskey="+accessKey;
             }
         } catch (Exception ex) {
             ex.printStackTrace();

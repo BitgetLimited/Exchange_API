@@ -8,14 +8,14 @@ import time
 import hashlib
 import hmac
 try:
-    from urllib import urlencode
+    from urllib import urlencode, parse
 except:
     from urllib.parse import urlencode
 
 #行情类接口
-BASE_API_PUBLIC = 'http://localhost:8081/data/v1'
+BASE_API_PUBLIC = 'https://api.bitget.com/data/v1'
 #交易类接口
-BASE_API_TRADE = 'http://localhost:8081/api/v1'
+BASE_API_TRADE = 'https://api.bitget.com/api/v1'
 
 headers = {
             "Content-type": "application/x-www-form-urlencoded",
@@ -30,15 +30,13 @@ class Client_BitGet():
         self.adapter = requests.adapters.HTTPAdapter(pool_connections=5,
                                                      pool_maxsize=5, max_retries=5)
         self.sessn.mount('http://', self.adapter)
-        self.sessn.mount('https://', self.adapter)
+        self.sessn.mount('http://', self.adapter)
         self.order_list = []
 
     def http_post_request(self,url, params, add_to_headers=None):
-
         if add_to_headers:
             headers.update(add_to_headers)
-        postdata = json.dumps(params)
-        response = requests.post(url, postdata, headers=headers, timeout=30)
+        response = requests.post(url=url, data=params, headers=headers, timeout=30)
         try:
 
             if response.status_code == 200:
@@ -60,20 +58,22 @@ class Client_BitGet():
         for key in sorted(params.keys()):
             param += key + '=' + str(params.get(key)) + '&'
         param = param.rstrip('&')
+        print("param="+param)
         signature = self.signature(message=param)
         reqTime = str(time.time() * 1000).split('.')
         param += "&sign=" + signature
         param += "&req_time=" + reqTime[0]
-        params['sign'] = signature
-        params['req_time'] = reqTime[0]
-        url = BASE_API_TRADE + path + '?' + param;
+        param += "&accesskey=" + self._public_key
         if (reqMethod == 'get'):
             print(reqMethod)
+            url = BASE_API_TRADE + path + '?' + param;
             resp = requests.get(url, headers=headers, timeout=20)
             data = json.loads(resp.content)
             return data
         if(reqMethod == 'post'):
+            #将加密信息与请求参数分开
             print(reqMethod)
+            url = BASE_API_TRADE + path + '?sign=' + signature + '&req_time='+reqTime[0] + "&accesskey="+self._public_key
             return self.http_post_request(url=url, params=params)
 
 
@@ -92,7 +92,7 @@ class Client_BitGet():
     # 获取个人ID
     def accounts(self):
         params = {
-            'accesskey': self._public_key}
+            'method': 'accounts'}
         print(self._public_key)
         resp = self.signedRequest_Trade(path='/account/accounts', params=params, reqMethod='get')
         return resp
@@ -100,14 +100,14 @@ class Client_BitGet():
     # 获取个人资产
     def balance(self, account_id):
         params = {
-            'accesskey': self._public_key}
+            'method': 'balance'}
         print(self._public_key)
         resp = self.signedRequest_Trade(path='/accounts/'+account_id+'/balance', params=params, reqMethod='get')
         return resp
 
 
     #委单
-    def place(self,account_id,amount,price,types,symbol):
+    def place(self,account_id,amount,types,symbol):
         '''
             获取多个委托买单或卖单，每次请求返回10条记录
             side: 可选 buy 1 /sell 0
@@ -119,75 +119,61 @@ class Client_BitGet():
         params = {
             'account_id': account_id,
             'amount': amount,
-            'price': price,
-            'type': types,
             'symbol': symbol,
-            'accesskey': self._public_key,
-            'method': 'place'}
+            'type': types}
         print(self._public_key)
         resp = self.signedRequest_Trade(path='/order/orders/place',params=params, reqMethod='post')
         return resp
 
     #取消委单
     def cancel(self,id):
-        params = {'method': 'submitcancel', 'accesskey': self._public_key}
-        resp = self.signedRequest_Trade(path='/order/orders/'+id+'/submitcancel', params=params, reqMethod='post')
-        return resp
-
-    #批量撤销委单
-    def batchcancel(self,id):
-
-        params = {'method': 'submitcancel', 'accesskey': self._public_key}
+        params = {'method': 'submitcancel'}
         resp = self.signedRequest_Trade(path='/order/orders/'+id+'/submitcancel', params=params, reqMethod='post')
         return resp
 
     #获取单个订单信息
     def getOrder(self,order_id):
-        params = {'accesskey': self._public_key}
+        params = {'method': 'getOrder'}
         resp = self.signedRequest_Trade(path ='/order/orders/'+order_id,params=params, reqMethod='post')
         return resp
 
     # 获取单个订单信息
     def getOrderDetail(self, order_id):
-        params = {'accesskey': self._public_key}
+        params = {'method':'matcharesultsSingle'}
         resp = self.signedRequest_Trade(path='/order/orders/' + order_id +'/matchresults', params=params, reqMethod='post')
         return resp
 
     #获取用户所有委单
-    def getOrders(self,symbol, types, start_date, end_date,states,sizePage,fromId,direct):
+    def getOrders(self,symbol, types, start_date, end_date,states,sizePage):
         symbol = symbol.lower()
         if 'usd' in symbol:
             symbol = symbol.replace('usd','usdt')
         params = {
-            'method': 'matchresults',
-            'accesskey': self._public_key,
-            'symbol':symbol,
-            'types':types,
-            'start_date':start_date,
             'end_date':end_date,
-            'states': states,
+            'method':'getOrders',
             'size': sizePage,
-            'from': fromId,
-            'direct': direct}
+            'start_date': start_date,
+            'states': states,
+            'symbol': symbol,
+            'types': types
+            }
         resp = self.signedRequest_Trade(path ='/order/matchresults',params=params, reqMethod='post')
         return resp
 
     # 获取用户所有委单
-    def orders(self, symbol, types, start_date, end_date, states, sizePage, fromId, direct):
+    def orders(self, symbol, types, start_date, end_date, states, sizePage):
         symbol = symbol.lower()
         if 'usd' in symbol:
             symbol = symbol.replace('usd', 'usdt')
         params = {
-            'method': 'orders',
-            'accesskey': self._public_key,
-            'symbol': symbol,
-            'types': types,
-            'start_date': start_date,
             'end_date': end_date,
-            'states': states,
+            'method': 'orders',
             'size': sizePage,
-            'from': fromId,
-            'direct': direct}
+            'start_date': start_date,
+            'states': states,
+            'symbol': symbol,
+            'types': types
+            }
         resp = self.signedRequest_Trade(path='/order/orders', params=params, reqMethod='get')
         return resp
 
@@ -198,20 +184,18 @@ class Client_BitGet():
         if 'usd' in currency:
             currency = currency.replace('usd', 'usdt')
         params = {
-            'method': 'withdrawCreate',
-            'accesskey': self._public_key,
             'address':address,
             'amount': amount,
             'currency':currency,
-            'fees':fees}
+            'fees':fees,
+            'method': 'withdrawCreate'}
         resp = self.signedRequest_Trade(path='/dw/withdraw/api/create', params=params, reqMethod='post')
         return resp
 
     # 取消提现
     def withdrawCancel(self, withdrawId):
         params = {
-            'method': 'withdrawCancel',
-            'accesskey': self._public_key}
+            'method': 'withdrawCancel'}
         resp = self.signedRequest_Trade(path='/dw/withdraw-virtual/'+withdrawId+'/cancel', params=params, reqMethod='post')
         return resp
 
@@ -219,7 +203,6 @@ class Client_BitGet():
     def withdrawSelect(self,currency,typeSymbol,sizeNumber):
         params = {
             'method': 'withdrawCancel',
-            'accesskey': self._public_key,
             'currency': currency,
             'type': typeSymbol,
             'size':sizeNumber}
@@ -310,29 +293,29 @@ class Client_BitGet():
 
 #################################行情类接口 end##################
 
-apikey = 'ake662d54c38d442c0'
-secretkey = '5373621290734285922bc4d4e7b260b9'
+apikey = 'ake661c38d442c0'
+secretkey = '5373622734285922bc4d4e7b260b9'
 client = Client_BitGet(apikey,secretkey)
 
 ####order start######
 #交易对类型，请填写系统所支持的交易对，例：IOST/BTC 写成：iost_btc
-account_id='391239256960'
+account_id='3903501889256960'
 symbol = 'eth_btc'
 #交易类型，0(buy)/1(sell)
-types = 'buy-limit'
+types = 'buy-market'
 #单价
-price = '0.009'
+#price = '0.009'
 #要买或卖的数量
 amount = '1'
-# respJson = client.place(account_id,amount,price,types,symbol)
-# print(respJson)
+respJson = client.place(account_id,amount,types,symbol)
+print(respJson)
 ####order end######
 
 
 ####cancel start######
 #交易对类型，请填写系统所支持的交易对，例：IOST/BTC 写成：iost_btc
 #委单的ID
-id = '401608425894621184'
+id = '4027320129393408'
 # respJson = client.cancel(id)
 # print(respJson)
 ####cancel end######
@@ -341,14 +324,14 @@ id = '401608425894621184'
 
 ####getOrder start######
 #委单ID
-order_id = '401626758983495680'
+order_id = '4027321429393408'
 # respJson = client.getOrder(order_id)
 # print(respJson)
 ####getOrder end######
 
 ####getOrder start######
 #委单ID
-order_id = '401626758983495680'
+order_id = '40127917569637376'
 # respJson = client.getOrderDetail(order_id)
 # print(respJson)
 ####getOrder end######
@@ -362,12 +345,12 @@ symbol = 'eth_btc'
 #第几页，
 start_date = '2018-06-01'
 #每页有多少条数据，
-end_date = '2018-07-12'
+end_date = '2018-07-17'
 states = 'submitted'
 sizePage = '2'
-fromId = '401608425894621184'
-direct = 'next'
-# respJson = client.getOrders(symbol, types, start_date, end_date,states,sizePage,fromId,direct)
+# fromId = '401608425894621184'
+# direct = 'next'
+# respJson = client.getOrders(symbol, types, start_date, end_date,states,sizePage)
 # print(respJson)
 ####getOrders end######
 
@@ -378,18 +361,16 @@ symbol = 'eth_btc'
 #第几页，
 start_date = '2018-06-01'
 #每页有多少条数据，
-end_date = '2018-07-12'
+end_date = '2018-07-17'
 states = 'submitted'
 sizePage = '2'
-fromId = '401608425894621184'
-direct = 'next'
-# respJson = client.getOrders(symbol, types, start_date, end_date,states,sizePage,fromId,direct)
+# respJson = client.orders(symbol, types, start_date, end_date,states,sizePage)
 # print(respJson)
 ####orders end######
 
 ####withdraw start 提现######
 #提现的数据
-amount = '1'
+amount = '10'
 #提现的币种
 currency = 'btc'
 #提现的手续费
@@ -403,7 +384,7 @@ address = '1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi'
 
 ####withdrawCancel start 提现######
 #提现的数据
-withdrawId = '211'
+withdrawId = '2140'
 # respJson = client.withdrawCancel(withdrawId)
 # print(respJson)
 ####withdraw end######withdrawSelect(self,currency,typeSymbol,sizeNumber)
@@ -424,7 +405,7 @@ sizeNumber = '10'
 ####accounts end######
 
 ####balance start ######
-account_id = '390350274889256960'
+account_id = '39035174889256960'
 # respJson = client.balance(account_id)
 # print(respJson)
 ####balance end######
@@ -474,5 +455,5 @@ currency = 'eth_btc'
 symbol='eth_btc'
 period='1min'
 size='2'
-respJson = client.kline(symbol,period,size)
-print(respJson)
+# respJson = client.kline(symbol,period,size)
+# print(respJson)
