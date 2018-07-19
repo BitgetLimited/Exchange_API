@@ -11,211 +11,276 @@ import (
 	"crypto/hmac"
 	"time"
 	"strconv"
+	"sort"
+	"net/url"
+	"io/ioutil"
 )
-const accessKey string="ak**0f"
-const secretKey string="dd***463"
-const marketUrl string="http://devapi.upex.com:8083/api-server/api/v2/"
-const dataUrl string="http://devapi.upex.com:8083/api-server/data/v2/"
+const accessKey string="ake662d54c38d442c0"
+const secretKey string="5373621290734285922bc4d4e7b260b9"
+const marketUrl string="http://localhost:8081/api/v1"
+const dataUrl string="http://localhost:8081/data/v1"
 
 
 func main() {
-	//ticker( "iost_btc")
-	//depth("iost_btc","20", "0.1")
-	//trades("iost_btc")
-	//kline("iost_btc","0", "20")
 
+	//kline("iost_btc","1min", "20")
+	//merged("iost_btc")
+	//tickers()
+	//depth("iost_btc","step0")
+	//trade("iost_btc")
+	//trades("iost_btc","10")
+	//detail("iost_btc")
+	//symbols()
+	//currencys()
+	//timestamp()
 
-
-	//fmt.Println(hmacSign("method=order&accesskey=akdf619e727f20400f&price=1&amount=2&tradeType=0&currency=iost_btc"))
-	//order("0.12","1","0","iost_btc")
-	//cancel("391400717711093760","iost_btc")
-	//getOrder("391400717711093760","iost_btc")
-	//getOrders("0","iost_btc","1","40")
-	//getAccountInfo()
-	//getUserAddress("btc")
-	//getWithdrawRecord("btc","1","40")
-	//getChargeRecord("btc","1","40")
-	//withdraw("3","btc","0.01","1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi")
+	//accounts()
+	//balance("390350274889256960")
+	//place("390350274889256960","10","eth_btc","buy-limit","0.003")
+	//submitcancel("403457624143605760")
+	//order("403457624143605760")
+	//matchresults("403457624143605760")
+	//symbol string,types string,start_date string,end_date string,states string,size string,from string,direct string
+	//matchresultsHistory("eth_btc","buy-limit","2018-06-01","2018-07-20","submitted","10","402727408014241792","prev")
+	//orders("eth_btc","buy-limit","2018-06-01","2018-07-20","submitted","10","402727408014241792","prev")
+	//address string,amount string,currency string,fees string
+	//withdrawCreate("1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi","10","btc","0.001")
+	//withdrawCancel("275")
+	withdrawSelect("btc","withdraw","10")
 
 }
 
 /**** 交易类接口示例 start *****/
-/**
- * 委托下单
- * method:固定值，写order就好
- * accesskey:自己的accesskey
- * price:单价，最多8位小数
- * amout:数量，最多12位小数
- * tradeType:交易类型，1:卖，0:买
- * currency:交易对，ps:输入的交易对确保是本系统所支持的。
- * @throws Exception
- */
-func order(price string,amount string,tradeType string,currency string){
-	orderParam := "method=order&accesskey="+accessKey+"&price="+price+"&amount="+amount+"&tradeType="+tradeType+"&currency="+currency
-	orderSign := hmacSign(orderParam)
+
+func accounts(){
+	mapParams := make(map[string]string)
+	mapParams["method"] = "accounts"
+	strParams := Map2UrlQuery(mapParams)
+	//orderParam := "method=order&accesskey="+accessKey+"&price="+price+"&amount="+amount+"&tradeType="+tradeType+"&currency="+currency
+	orderSign := hmacSign(strParams)
 	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
-	orderURL := marketUrl+"order?"+orderParam+"&sign="+orderSign+"&reqTime="+reTime
-	httpGet(orderURL)
+	accountsURL := marketUrl+"/account/accounts?"+strParams+"&accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
+	httpGet(accountsURL)
 }
-/**
- * 取消下单
- * menthod:固定值，写cancel就好
- * accesskey:自己的accesskey
- * id:下单的编号
- * currency:交易对，ps:输入的交易对确保是本系统所支持的。
- * @throws Exception
- */
-func cancel(id string,currency string){
-	orderParam := "method=cancel&accesskey="+accessKey+"&id="+id+"&currency="+currency
-	orderSign := hmacSign(orderParam)
+func balance(account_id string){
+	mapParams := make(map[string]string)
+	mapParams["method"] = "balance"
+	strParams := Map2UrlQuery(mapParams)
+	//orderParam := "method=order&accesskey="+accessKey+"&price="+price+"&amount="+amount+"&tradeType="+tradeType+"&currency="+currency
+	orderSign := hmacSign(strParams)
 	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
-	orderURL := marketUrl+"cancel?"+orderParam+"&sign="+orderSign+"&reqTime="+reTime
-	httpGet(orderURL)
+	balanceURL := marketUrl+"/accounts/"+account_id+"/balance?"+strParams+"&accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
+	httpGet(balanceURL)
 }
-/**
- * 获取某个交易单内容
- * method:固定值，写getOrder就好
- * accesskey:自己的accesskey
- * id:交易单编号
- * currency:交易对，ps:输入的交易对确保是本系统所支持的。
- * @throws Exception
- */
-func getOrder(id string,currency string){
-	orderParam := "method=getOrder&accesskey="+accessKey+"&id="+id+"&currency="+currency
-	orderSign := hmacSign(orderParam)
+//委单
+func place(account_id string,amount string,symbol string,types string,price string){
+	mapParams := make(map[string]string)
+	mapParams["method"] = "place"
+	mapParams["account_id"] = account_id
+	mapParams["amount"] = amount
+	mapParams["symbol"] = symbol
+	mapParams["type"] = types
+	if 0 < len(price) {
+		mapParams["price"] = price
+	}
+	strParams := Map2UrlQuery(mapParams)
+	orderSign := hmacSign(strParams)
 	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
-	orderURL := marketUrl+"getOrder?"+orderParam+"&sign="+orderSign+"&reqTime="+reTime
-	httpGet(orderURL)
+	placeURL := marketUrl+"/order/orders/place?accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
+	body :=HttpPostRequest(placeURL,mapParams)
+	fmt.Println(body)
 }
-/**
- * 获取自己名下某种类型交易的所以交易单
- * method:固定值，写getOrders就好
- * accesskey:自己的accesskey
- * tradeType:交易类型，1:卖，0:买
- * currency:交易对，ps:输入的交易对确保是本系统所支持的。
- * pageIndex:第几页
- * pageSize:每页多少条
- * @throws Exception
- */
-func getOrders(tradeType string,currency string,pageIndex string,pageSize string){
-	orderParam := "method=getOrders&accesskey="+accessKey+"&tradeType="+tradeType+"&currency="+currency+"&pageIndex="+pageIndex+"&pageSize="+pageSize
-	orderSign := hmacSign(orderParam)
+//取消委单
+func submitcancel(order_id string){
+	mapParams := make(map[string]string)
+	mapParams["method"] = "submitcancel"
+	strParams := Map2UrlQuery(mapParams)
+	orderSign := hmacSign(strParams)
 	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
-	orderURL := marketUrl+"getOrders?"+orderParam+"&sign="+orderSign+"&reqTime="+reTime
-	httpGet(orderURL)
+	placeURL := marketUrl+"/order/orders/"+order_id+"/submitcancel?accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
+	body :=HttpPostRequest(placeURL,mapParams)
+	fmt.Println(body)
 }
-/**
- * 获取用户信息
- * method:固定值，写getAccountInfo就好
- * accesskey:自己的accesskey
- * @throws Exception
- */
-func getAccountInfo(){
-	orderParam := "method=getAccountInfo&accesskey="+accessKey
-	orderSign := hmacSign(orderParam)
+//查询委单
+func order(order_id string){
+	mapParams := make(map[string]string)
+	mapParams["method"] = "order"
+	strParams := Map2UrlQuery(mapParams)
+	orderSign := hmacSign(strParams)
 	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
-	orderURL := marketUrl+"getAccountInfo?"+orderParam+"&sign="+orderSign+"&reqTime="+reTime
-	httpGet(orderURL)
+	placeURL := marketUrl+"/order/orders/"+order_id+"?accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
+	body :=HttpPostRequest(placeURL,mapParams)
+	fmt.Println(body)
 }
-/**
- * 获取用户充值地址
- * method:固定值，写getUserAddress就好
- * accesskey:自己的accesskey
- * currency:系统所支持的货币类型，
- * @throws Exception
- */
-func getUserAddress(currency string){
-	orderParam := "method=getUserAddress&accesskey="+accessKey+"&currency="+currency
-	orderSign := hmacSign(orderParam)
+//查询某个订单的成交明细
+func matchresults(order_id string){
+	mapParams := make(map[string]string)
+	mapParams["method"] = "matchresults"
+	strParams := Map2UrlQuery(mapParams)
+	orderSign := hmacSign(strParams)
 	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
-	orderURL := marketUrl+"getUserAddress?"+orderParam+"&sign="+orderSign+"&reqTime="+reTime
-	httpGet(orderURL)
+	placeURL := marketUrl+"/order/orders/"+order_id+"/matchresults?accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
+	body :=HttpPostRequest(placeURL,mapParams)
+	fmt.Println(body)
 }
-/**
- * 获取数字资产提现记录
- * method:固定值，写getWithdrawRecord就好
- * accesskey:自己的accesskey
- * currency:系统所支持的货币类型，
- * pageIndex:第几页
- * pageSize:每页有多少条数据
- * @throws Exception
- */
-func getWithdrawRecord(currency string,pageIndex string,pageSize string){
-	orderParam := "method=getWithdrawRecord&accesskey="+accessKey+"&currency="+currency+"&pageIndex="+pageIndex+"&pageSize="+pageSize
-	orderSign := hmacSign(orderParam)
+//查询某个订单的成交明细
+func matchresultsHistory(symbol string,types string,start_date string,end_date string,states string,size string,from string,direct string){
+	mapParams := make(map[string]string)
+	mapParams["method"] = "matchresultsHistory"
+	mapParams["symbol"] = symbol
+	mapParams["types"] = types
+	mapParams["start_date"] = start_date
+	mapParams["end_date"] = end_date
+	mapParams["states"] = states
+	mapParams["size"] = size
+	if 0 < len(from) {
+		if 0 < len(direct) {
+			mapParams["from"] = from
+			mapParams["direct"] = direct
+		}
+	}
+	strParams := Map2UrlQuery(mapParams)
+	orderSign := hmacSign(strParams)
 	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
-	orderURL := marketUrl+"getWithdrawRecord?"+orderParam+"&sign="+orderSign+"&reqTime="+reTime
-	httpGet(orderURL)
+	placeURL := marketUrl+"/order/matchresults?accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
+	body :=HttpPostRequest(placeURL,mapParams)
+	fmt.Println(body)
 }
-/**
- * 获取数字资产充值记录
- * method:固定值，写getChargeRecord就好
- * accesskey:自己的accesskey
- * currency:系统所支持的货币类型，
- * pageIndex:第几页
- * pageSize:每页有多少条数据
- * @throws Exception
- */
-func getChargeRecord(currency string,pageIndex string,pageSize string){
-	orderParam := "method=getChargeRecord&accesskey="+accessKey+"&currency="+currency+"&pageIndex="+pageIndex+"&pageSize="+pageSize
-	orderSign := hmacSign(orderParam)
+//查询某个订单的成交明细 get方式
+func orders(symbol string,types string,start_date string,end_date string,states string,size string,from string,direct string){
+	mapParams := make(map[string]string)
+	mapParams["method"] = "orders"
+	mapParams["symbol"] = symbol
+	mapParams["types"] = types
+	mapParams["start_date"] = start_date
+	mapParams["end_date"] = end_date
+	mapParams["states"] = states
+	mapParams["size"] = size
+	if 0 < len(from) {
+		if 0 < len(direct) {
+			mapParams["from"] = from
+			mapParams["direct"] = direct
+		}
+	}
+	strParams := Map2UrlQuery(mapParams)
+	orderSign := hmacSign(strParams)
 	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
-	orderURL := marketUrl+"getChargeRecord?"+orderParam+"&sign="+orderSign+"&reqTime="+reTime
-	httpGet(orderURL)
+	placeURL := marketUrl+"/order/orders?"+strParams+"&accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
+	httpGet(placeURL)
 }
-/**
- * 提现
- * method:固定值，withdraw
- * accesskey:自己的accesskey
- * amount：提现数量
- * currency：提现币种
- * fees：提现手续费
- * receiveAddress：提现地址
- * @throws Exception
- */
-func withdraw(amount string,currency string,fees string,receiveAddress string){
-	orderParam := "method=withdraw&accesskey="+accessKey+"&amount="+amount+"&currency="+currency+"&fees="+fees+"&receiveAddress="+receiveAddress
-	orderSign := hmacSign(orderParam)
+//提现
+func withdrawCreate(address string,amount string,currency string,fees string){
+	mapParams := make(map[string]string)
+	mapParams["method"] = "withdrawCreate"
+	mapParams["address"] = address
+	mapParams["amount"] = amount
+	mapParams["currency"] = currency
+	mapParams["fees"] = fees
+	strParams := Map2UrlQuery(mapParams)
+	orderSign := hmacSign(strParams)
 	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
-	orderURL := marketUrl+"withdraw?"+orderParam+"&sign="+orderSign+"&reqTime="+reTime
-	httpGet(orderURL)
+	placeURL := marketUrl+"/dw/withdraw/api/create?accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
+	body :=HttpPostRequest(placeURL,mapParams)
+	fmt.Println(body)
 }
+//取消提现
+func withdrawCancel(withdraw_id string){
+	mapParams := make(map[string]string)
+	mapParams["method"] = "withdrawCancel"
+	strParams := Map2UrlQuery(mapParams)
+	orderSign := hmacSign(strParams)
+	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
+	placeURL := marketUrl+"/dw/withdraw-virtual/"+withdraw_id+"/cancel?accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
+	body :=HttpPostRequest(placeURL,mapParams)
+	fmt.Println(body)
+}
+//查询提现记录
+func withdrawSelect(currency string,types string,size string){
+	mapParams := make(map[string]string)
+	mapParams["method"] = "withdrawSelect"
+	mapParams["currency"] = currency
+	mapParams["type"] = types
+	mapParams["size"] = size
+	strParams := Map2UrlQuery(mapParams)
+	orderSign := hmacSign(strParams)
+	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
+	placeURL := marketUrl+"/order/deposit_withdraw?"+strParams+"&accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
+	httpGet(placeURL)
+}
+
+
 
 /**** 交易类接口示例 end *****/
 
 
 /**** 行情类接口示例 start *****/
 /**
-* 行情
-*/
-func ticker(currency string){
-	tickerDataURL := dataUrl + "ticker?currency=" + currency
-	httpGet(tickerDataURL)
-}
-/**
-* 市场深度
-*/
-func depth( currency string, size string, merge string){
-	depthDataURL := dataUrl + "depth?currency=" + currency + "&size=" +size+ "&merge=" +merge
-	httpGet(depthDataURL)
-}
-/**
-* 历史成交
-*/
-func trades( currency string){
-	tradesDataURL := dataUrl + "trades?currency=" + currency
-	httpGet(tradesDataURL)
-}
-/**
 * k线
 */
 func kline( currency string, tradeType string, size string){
-	klineDataURL := dataUrl + "kline?currency=" + currency + "&type=" +tradeType+ "&size=" +size
+	klineDataURL := dataUrl + "/market/history/kline?symbol=" + currency + "&period=" +tradeType+ "&size=" +size
+	httpGet(klineDataURL)
+}
+func merged( currency string){
+	klineDataURL := dataUrl + "/market/detail/merged?symbol=" + currency
+	httpGet(klineDataURL)
+}
+func tickers(){
+	klineDataURL := dataUrl + "/market/tickers"
+	httpGet(klineDataURL)
+}
+func depth(currency string, types string){
+	klineDataURL := dataUrl + "/market/depth?symbol="+currency+"&type="+types
+	httpGet(klineDataURL)
+}
+func trade(currency string){
+	klineDataURL := dataUrl + "/market/trade?symbol="+currency
+	httpGet(klineDataURL)
+}
+func trades(currency string, size string){
+	klineDataURL := dataUrl + "/market/history/trade?symbol="+currency+"&size="+size
+	httpGet(klineDataURL)
+}
+func detail(currency string){
+	klineDataURL := dataUrl + "/market/detail?symbol="+currency
+	httpGet(klineDataURL)
+}
+func symbols(){
+	klineDataURL := dataUrl + "/common/symbols"
+	httpGet(klineDataURL)
+}
+func currencys(){
+	klineDataURL := dataUrl + "/common/currencys"
+	httpGet(klineDataURL)
+}
+func timestamp(){
+	klineDataURL := dataUrl + "/common/timestamp"
 	httpGet(klineDataURL)
 }
 /**** 行情类接口示例 end *****/
 
 /********** util ******************/
+
+func Map2UrlQuery(mapParams map[string]string) string {
+	var keys []string
+	for k := range mapParams {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	//fmt.Println(keys)
+
+	var strParams string
+	for j := 0; j < len(keys); j++ {
+		//fmt.Println(j)
+		strParams += (keys[j] + "=" + mapParams[keys[j]] + "&")
+	}
+
+	if 0 < len(strParams) {
+		strParams = string([]rune(strParams)[:len(strParams)-1])
+	}
+	//fmt.Println(strParams)
+	return strParams
+}
 
 func digest() string {
 	hash := sha1.New()
@@ -256,4 +321,30 @@ func httpGet(url1 string) {
 	status := response.StatusCode
 
 	fmt.Println(status)
+}
+
+
+func HttpPostRequest(strUrl string, mapParams map[string]string) string {
+	data := make(url.Values)
+	var keys []string
+	for k := range mapParams {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for j := 0; j < len(keys); j++ {
+		data[keys[j]] = []string{mapParams[keys[j]]}
+	}
+	res, err := http.PostForm(strUrl, data)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		//return
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if nil != err {
+		return err.Error()
+	}
+	return string(body)
+
 }

@@ -15,7 +15,7 @@ except:
 #行情类接口
 BASE_API_PUBLIC = 'https://api.bitget.com/data/v1'
 #交易类接口
-BASE_API_TRADE = 'http://api.bitget.com/api/v1'
+BASE_API_TRADE = 'https://api.bitget.com/api/v1'
 
 headers = {
             "Content-type": "application/x-www-form-urlencoded",
