@@ -330,13 +330,12 @@ namespace bitget {
      * 提现
      */
     public static String withdrawCreate(string accesskey,string secretkey,string tradeURL,long stamp,
-      string address,string amount,string currency,string fees) {
+      string address,string amount,string currency) {
       Dictionary<string, string> dic = new Dictionary<string, string>();
       dic.Add("method", "withdrawCreate");
       dic.Add("address", address);
       dic.Add("amount", amount);
       dic.Add("currency", currency);
-      dic.Add("fees", fees);
       
       String param = "";
       foreach (KeyValuePair<string,string> kv in dic)
@@ -500,7 +499,7 @@ namespace bitget {
       //result = matchresultsHistory(accesskey, secretkey, tradeURL, stamp, "iost_eth","buy-limit","2018-06-01","2018-07-20","submitted","50","403743336575315968","prev");
       //result = orders(accesskey, secretkey, tradeURL, stamp, "iost_eth","buy-limit","2018-06-01","2018-07-20","submitted","50","403743336575315968","next");
       //string address,string amount,string currency,string fees
-      //result = withdrawCreate(accesskey, secretkey, tradeURL, stamp, "1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi","10","btc","0.0001");
+      //result = withdrawCreate(accesskey, secretkey, tradeURL, stamp, "1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi","10","btc");
       //result = withdrawCancel(accesskey, secretkey, tradeURL, stamp, "281");
       result = withdrawSelect(accesskey, secretkey, tradeURL, stamp, "btc","withdraw","10");
       

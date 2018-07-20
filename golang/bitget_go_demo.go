@@ -15,10 +15,10 @@ import (
 	"net/url"
 	"io/ioutil"
 )
-const accessKey string="ake662d54c38d442c0"
-const secretKey string="5373621290734285922bc4d4e7b260b9"
-const marketUrl string="http://localhost:8081/api/v1"
-const dataUrl string="http://localhost:8081/data/v1"
+const accessKey string="ake662d512c38d442c0"
+const secretKey string="537362129124285922bc4d4e7b260b9"
+const marketUrl string="https://api.bitget.com/api/v1"
+const dataUrl string="https://api.bitget.com/data/v1"
 
 
 func main() {
@@ -43,8 +43,8 @@ func main() {
 	//symbol string,types string,start_date string,end_date string,states string,size string,from string,direct string
 	//matchresultsHistory("eth_btc","buy-limit","2018-06-01","2018-07-20","submitted","10","402727408014241792","prev")
 	//orders("eth_btc","buy-limit","2018-06-01","2018-07-20","submitted","10","402727408014241792","prev")
-	//address string,amount string,currency string,fees string
-	//withdrawCreate("1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi","10","btc","0.001")
+	//address string,amount string,currency string
+	//withdrawCreate("1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi","10","btc")
 	//withdrawCancel("275")
 	withdrawSelect("btc","withdraw","10")
 
@@ -169,13 +169,12 @@ func orders(symbol string,types string,start_date string,end_date string,states 
 	httpGet(placeURL)
 }
 //提现
-func withdrawCreate(address string,amount string,currency string,fees string){
+func withdrawCreate(address string,amount string,currency string){
 	mapParams := make(map[string]string)
 	mapParams["method"] = "withdrawCreate"
 	mapParams["address"] = address
 	mapParams["amount"] = amount
 	mapParams["currency"] = currency
-	mapParams["fees"] = fees
 	strParams := Map2UrlQuery(mapParams)
 	orderSign := hmacSign(strParams)
 	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)

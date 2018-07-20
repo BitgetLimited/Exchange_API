@@ -30,7 +30,7 @@ $Fond_bitget=$bitget->batchcancel();
 //matchresultsHistory($symbol='',$types='',$start_date='',$end_date='',$states='',$size=0,$from='',$direct='')
 #$Fond_bitget=$bitget->matchresultsHistory('eth_btc','buy-market','2018-06-01','2018-07-18','submitted','10','','');
 #$Fond_bitget=$bitget->orders('eth_btc','buy-market','2018-06-01','2018-07-18','submitted','20','','');
-//$Fond_bitget=$bitget->withdrawCreate('2','btc','0.001','1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi');
+//$Fond_bitget=$bitget->withdrawCreate('2','btc','1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi');
 //$Fond_bitget=$bitget->withdrawCancel('250');
 #$Fond_bitget=$bitget->withdrawSelect('btc','withdraw','10');
 
@@ -380,16 +380,13 @@ class bitgetAPI {
 
     /** 提现
      */
-    function withdrawCreate($amount,$currency,$fees,$receiveAddress){
+    function withdrawCreate($amount,$currency,$receiveAddress){
         $this->api_method = '/dw/withdraw/api/create';
         // 数据参数
         $post_data['method'] = 'withdrawCreate';
         $post_data['amount'] = $amount;
         $post_data['currency'] = $currency;
         $post_data['address'] = $receiveAddress;
-        if($fees){
-            $post_data['fees'] = $fees;
-        }
         $url = $this->create_sign_url($post_data);
         $res = $this->request_post($url, $post_data);
         return json_decode($res);

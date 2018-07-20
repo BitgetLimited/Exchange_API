@@ -218,7 +218,6 @@ public class ApiDemo {
         paramMap.put("address","1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi");
         paramMap.put("amount","10");
         paramMap.put("currency","btc");
-        paramMap.put("fees","0.1");
         String signs = signUp(paramMap,"post");
         String method = "/dw/withdraw/api/create";
         String s = post(method,paramMap,signs);

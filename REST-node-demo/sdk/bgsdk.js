@@ -225,14 +225,13 @@ var BITGET_PRO = {
         return call_api(url);
 
     },
-    withdrawCreate: function(accesskey,addressWithdraw,amount,currency,fees){
+    withdrawCreate: function(accesskey,addressWithdraw,amount,currency){
         var path = '/api/v1/dw/withdraw/api/create';
         var body = {
           'method':'withdrawCreate',
           'address':addressWithdraw,
           'amount':amount,
-          'currency':currency,
-          'fees':fees
+          'currency':currency
         }
         var p = require('querystring').stringify(body);
         var payload = sign_sha(p);

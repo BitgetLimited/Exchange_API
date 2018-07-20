@@ -184,7 +184,7 @@ class Client_BitGet():
 
 
     # 提现
-    def withdrawCreate(self, address,amount, currency,fees):
+    def withdrawCreate(self, address,amount, currency):
         currency = currency.lower()
         if 'usd' in currency:
             currency = currency.replace('usd', 'usdt')
@@ -192,7 +192,6 @@ class Client_BitGet():
             'address':address,
             'amount': amount,
             'currency':currency,
-            'fees':fees,
             'method': 'withdrawCreate'}
         resp = self.signedRequest_Trade(path='/dw/withdraw/api/create', params=params, reqMethod='post')
         return resp
@@ -377,11 +376,9 @@ sizePage = '2'
 amount = '10'
 #提现的币种
 currency = 'btc'
-#提现的手续费
-fees = '0.001'
 #提现钱包地址
 address = '1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi'
-# respJson = client.withdrawCreate( address,amount, currency,fees)
+# respJson = client.withdrawCreate( address,amount, currency)
 # print(respJson)
 ####withdraw end######
 
