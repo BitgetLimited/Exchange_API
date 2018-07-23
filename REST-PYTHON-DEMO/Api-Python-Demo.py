@@ -136,6 +136,15 @@ class Client_BitGet():
         resp = self.signedRequest_Trade(path='/order/orders/'+id+'/submitcancel', params=params, reqMethod='post')
         return resp
 
+    
+    def batchcancel(self):
+        order_ids = [1,2,3]
+        print(str(order_ids))
+        #'[1,2,3]'
+        params = {'method':'batchcancel',"order_ids":str(order_ids)}
+        resp = self.signedRequest_Trade(path='/order/orders/batchcancel', params=params, reqMethod='post')
+        return resp
+
     #获取单个订单信息
     def getOrder(self,order_id):
         params = {'method': 'getOrder'}
@@ -313,6 +322,10 @@ amount = '10'
 respJson = client.place(account_id,amount,types,symbol,price)
 print(respJson)
 ####order end######
+
+# 批量撤销
+# respJson = client.batchcancel()
+# print(respJson)
 
 
 ####cancel start######
