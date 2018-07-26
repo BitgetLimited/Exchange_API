@@ -165,7 +165,7 @@ namespace bitget {
      * 取消委托下单
      */
     public static String submitcancel(string accesskey,string secretkey,string tradeURL,long stamp,string order_id) {
-      Dictionary<string, string> dic = new Dictionary<string, string>();
+      SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
       dic.Add("method", "submitcancel");
       String param = "";
       foreach (KeyValuePair<string,string> kv in dic)
@@ -182,20 +182,44 @@ namespace bitget {
       //Console.WriteLine(result);
       return result;
     }
+    public static String batchcancel(string accesskey,string secretkey,string tradeURL,long stamp,string order_ids) {
+      SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
+      dic.Add("method", "submitcancel");
+      dic.Add("order_ids", order_ids);
+      String param = "";
+      foreach (KeyValuePair<string,string> kv in dic)
+      {
+        param += kv.Key + "=" + kv.Value + "&";
+      }
+      param=param.Substring(0,param.Length-1);
+      Console.WriteLine(param);
+      secretkey = digest(secretkey);
+      String sign = hmacSign(param, secretkey);
+      tradeURL += "/order/orders/batchcancel?sign=" + sign + "&req_time=" + stamp + "&accesskey=" + accesskey;
+      Console.WriteLine(tradeURL);
+      String result = HttpPost(tradeURL,param,null);
+      //Console.WriteLine(result);
+      return result;
+    }
+    
+    
     /**
      * 下单
      */
     public static String place(string accesskey,string secretkey,string tradeURL,long stamp,string price,string amount,string tradeType,string currency,string account_id) {
-      Dictionary<string, string> dic = new Dictionary<string, string>();
+      //Dictionary<string, string> dic = new Dictionary<string, string>();
+      SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
       dic.Add("amount", amount);
+      
+      dic.Add("account_id", account_id);
       dic.Add("type", tradeType);
       dic.Add("symbol", currency);
-      dic.Add("account_id", account_id);
       if (!string.IsNullOrEmpty(price))
       {
         dic.Add("price", price);
       }
       String param = "";
+      //Dictionary<string, string> ascdic = dic.OrderBy(o => o.Key).ToDictionary(o => o.Key, p => p.Value.ToString());//对key进行升序
       foreach (KeyValuePair<string,string> kv in dic)
       {
         param += kv.Key + "=" + kv.Value + "&";
@@ -214,7 +238,7 @@ namespace bitget {
      * 查询某个订单详情 所有状态的订单详情
      */
     public static String order(string accesskey,string secretkey,string tradeURL,long stamp,string order_id) {
-      Dictionary<string, string> dic = new Dictionary<string, string>();
+      SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
       dic.Add("method", "order");
       String param = "";
       foreach (KeyValuePair<string,string> kv in dic)
@@ -235,7 +259,7 @@ namespace bitget {
      * 查询某个订单详情 必须有撮合的才可以
      */
     public static String matchresults(string accesskey,string secretkey,string tradeURL,long stamp,string order_id) {
-      Dictionary<string, string> dic = new Dictionary<string, string>();
+      SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
       dic.Add("method", "orderMatchresults");
       String param = "";
       foreach (KeyValuePair<string,string> kv in dic)
@@ -257,7 +281,7 @@ namespace bitget {
      */
     public static String matchresultsHistory(string accesskey,string secretkey,string tradeURL,long stamp,
       string symbol,string types,string start_date,string end_date,string states,string size,string from,string direct) {
-      Dictionary<string, string> dic = new Dictionary<string, string>();
+      SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
       dic.Add("method", "orderMatchresults");
       dic.Add("symbol", symbol);
       dic.Add("types", types);
@@ -294,7 +318,7 @@ namespace bitget {
      */
     public static String orders(string accesskey,string secretkey,string tradeURL,long stamp,
       string symbol,string types,string start_date,string end_date,string states,string size,string from,string direct) {
-      Dictionary<string, string> dic = new Dictionary<string, string>();
+      SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
       dic.Add("method", "orderMatchresults");
       dic.Add("symbol", symbol);
       dic.Add("types", types);
@@ -331,11 +355,12 @@ namespace bitget {
      */
     public static String withdrawCreate(string accesskey,string secretkey,string tradeURL,long stamp,
       string address,string amount,string currency) {
-      Dictionary<string, string> dic = new Dictionary<string, string>();
+      SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
       dic.Add("method", "withdrawCreate");
       dic.Add("address", address);
-      dic.Add("amount", amount);
+      
       dic.Add("currency", currency);
+      dic.Add("amount", amount);
       
       String param = "";
       foreach (KeyValuePair<string,string> kv in dic)
@@ -356,7 +381,7 @@ namespace bitget {
      * 取消提现
      */
     public static String withdrawCancel(string accesskey,string secretkey,string tradeURL,long stamp,string withdraw_id) {
-      Dictionary<string, string> dic = new Dictionary<string, string>();
+      SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
       dic.Add("method", "withdrawCancel");
       
       String param = "";
@@ -378,11 +403,13 @@ namespace bitget {
      * 查询提现
      */
     public static String withdrawSelect(string accesskey,string secretkey,string tradeURL,long stamp,string currency,string type,string size) {
-      Dictionary<string, string> dic = new Dictionary<string, string>();
+      SortedDictionary<string, string> dic = new SortedDictionary<string, string>();
       dic.Add("method", "withdrawSelect");
-      dic.Add("currency", currency);
-      dic.Add("type", type);
+      
+      
       dic.Add("size", size);
+      dic.Add("type", type);
+      dic.Add("currency", currency);
       String param = "";
       foreach (KeyValuePair<string,string> kv in dic)
       {
@@ -400,7 +427,7 @@ namespace bitget {
     }
     
     
-    *
+    
      public static String kline(string marketURL,string symbol,string period,string size) {
       String param = "method=kline&symbol="+symbol+"&period="+period+"&size="+size; 
       marketURL += "/market/history/kline?" + param ;
@@ -474,8 +501,8 @@ namespace bitget {
     
     
     public static void Main(string[] args) {
-      string accesskey = "ake66212c38d442c0";
-      string secretkey = "5373621290731222bc4d4e7b260b9";
+      string accesskey = "ake661238d442c0";
+      string secretkey = "53736212123285922bc4d4e7b260b9";
       string tradeURL = "https://api.bitget.com/api/v1";
       string marketURL = "https://api.bitget.com/data/v1";
       DateTime timeStamp=new DateTime(1970,1,1);

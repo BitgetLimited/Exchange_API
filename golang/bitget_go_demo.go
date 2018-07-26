@@ -15,8 +15,8 @@ import (
 	"net/url"
 	"io/ioutil"
 )
-const accessKey string="ake662d512c38d442c0"
-const secretKey string="537362129124285922bc4d4e7b260b9"
+const accessKey string="ak123c38d442c0"
+const secretKey string="537362112385922bc4d4e7b260b9"
 const marketUrl string="https://api.bitget.com/api/v1"
 const dataUrl string="https://api.bitget.com/data/v1"
 
@@ -39,11 +39,12 @@ func main() {
 	//place("390350274889256960","10","eth_btc","buy-limit","0.003")
 	//submitcancel("403457624143605760")
 	//order("403457624143605760")
+	//batchcancel("[1,2,4,5,6]")
 	//matchresults("403457624143605760")
 	//symbol string,types string,start_date string,end_date string,states string,size string,from string,direct string
 	//matchresultsHistory("eth_btc","buy-limit","2018-06-01","2018-07-20","submitted","10","402727408014241792","prev")
 	//orders("eth_btc","buy-limit","2018-06-01","2018-07-20","submitted","10","402727408014241792","prev")
-	//address string,amount string,currency string
+	//address string,amount string,currency string,fees string
 	//withdrawCreate("1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi","10","btc")
 	//withdrawCancel("275")
 	withdrawSelect("btc","withdraw","10")
@@ -76,10 +77,11 @@ func balance(account_id string){
 func place(account_id string,amount string,symbol string,types string,price string){
 	mapParams := make(map[string]string)
 	mapParams["method"] = "place"
-	mapParams["account_id"] = account_id
+	mapParams["type"] = types
 	mapParams["amount"] = amount
 	mapParams["symbol"] = symbol
-	mapParams["type"] = types
+
+	mapParams["account_id"] = account_id
 	if 0 < len(price) {
 		mapParams["price"] = price
 	}
@@ -98,6 +100,17 @@ func submitcancel(order_id string){
 	orderSign := hmacSign(strParams)
 	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
 	placeURL := marketUrl+"/order/orders/"+order_id+"/submitcancel?accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
+	body :=HttpPostRequest(placeURL,mapParams)
+	fmt.Println(body)
+}
+func batchcancel(order_ids string){
+	mapParams := make(map[string]string)
+	mapParams["method"] = "batchcancel"
+	mapParams["order_ids"] = order_ids
+	strParams := Map2UrlQuery(mapParams)
+	orderSign := hmacSign(strParams)
+	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
+	placeURL := marketUrl+"/order/orders/batchcancel?accesskey="+accessKey+"&sign="+orderSign+"&req_time="+reTime
 	body :=HttpPostRequest(placeURL,mapParams)
 	fmt.Println(body)
 }
@@ -197,9 +210,9 @@ func withdrawCancel(withdraw_id string){
 func withdrawSelect(currency string,types string,size string){
 	mapParams := make(map[string]string)
 	mapParams["method"] = "withdrawSelect"
-	mapParams["currency"] = currency
-	mapParams["type"] = types
 	mapParams["size"] = size
+	mapParams["type"] = types
+	mapParams["currency"] = currency
 	strParams := Map2UrlQuery(mapParams)
 	orderSign := hmacSign(strParams)
 	reTime := strconv.FormatInt(time.Now().UnixNano()/1000000, 10)

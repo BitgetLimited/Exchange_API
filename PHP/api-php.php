@@ -24,7 +24,7 @@ $bitget=new bitgetAPI();
 //390350274889256960
 #$Fond_bitget=$bitget->balance('390350274889256960');
 #$Fond_bitget=$bitget->submitcancel('402988673034924032');
-$Fond_bitget=$bitget->batchcancel();
+//$Fond_bitget=$bitget->batchcancel();
 #$Fond_bitget=$bitget->orderSingle('402988673034924032');
 #$Fond_bitget=$bitget->matchresults('402988673034924032');
 //matchresultsHistory($symbol='',$types='',$start_date='',$end_date='',$states='',$size=0,$from='',$direct='')
@@ -32,7 +32,7 @@ $Fond_bitget=$bitget->batchcancel();
 #$Fond_bitget=$bitget->orders('eth_btc','buy-market','2018-06-01','2018-07-18','submitted','20','','');
 //$Fond_bitget=$bitget->withdrawCreate('2','btc','1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi');
 //$Fond_bitget=$bitget->withdrawCancel('250');
-#$Fond_bitget=$bitget->withdrawSelect('btc','withdraw','10');
+$Fond_bitget=$bitget->withdrawSelect('btc','withdraw','10');
 
 
 var_dump($Fond_bitget);
@@ -40,9 +40,9 @@ var_dump($Fond_bitget);
 class bitgetAPI {
     public $api_method = '';
     public $req_method = '';
-    var  $access_key="akdf12327f20400f";
-    var  $secret_key="dd906aaa62347593ee1b8b89788463";
-    //行情接口的url52.193.224.131
+    var  $access_key="ake61234c38d442c0";
+    var  $secret_key="537362123734285922bc4d4e7b260b9";
+    //行情接口的url
     var $market_URL="https://api.bitget.com/data/v1";
     //交易类接口url
     var $trade_URL="https://api.bitget.com/api/v1";
@@ -95,6 +95,7 @@ class bitgetAPI {
         echo '$append_param:';
         var_dump($append_param);
         echo ':$append_param';
+        ksort($append_param);
         $o = "";
         foreach ( $append_param as $k => $v )
         {
@@ -283,15 +284,15 @@ class bitgetAPI {
         $this->req_method = 'POST';
         // 数据参数
         $post_data['account_id'] = $account_id;
-        $post_data['amount'] = $amount;
-
-        $post_data['method'] = 'place';
-        $post_data['symbol'] = $symbol;
-
-        $post_data['type'] = $type;
         if ($price) {
             $post_data['price'] = $price;
         }
+        $post_data['type'] = $type;
+        $post_data['method'] = 'place';
+        $post_data['symbol'] = $symbol;
+        $post_data['amount'] = $amount;
+
+
         $url = $this->create_sign_url($post_data);
         $res = $this->request_post($url, $post_data);
         return json_decode($res);
@@ -405,10 +406,12 @@ class bitgetAPI {
         $this->api_method = '/order/deposit_withdraw';
         $this->req_method = 'get';
         // 数据参数
-        $post_data['method'] = 'withdrawCancel';
         $post_data['currency'] = $currency;
-        $post_data['type'] = $type;
+        $post_data['method'] = 'withdrawCancel';
+
+
         $post_data['size'] = $size;
+        $post_data['type'] = $type;
         $url = $this->create_sign_url($post_data);
         $res = $this->httpRequest_get($url);
         return json_decode($res);

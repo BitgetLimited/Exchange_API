@@ -7,17 +7,18 @@ function run() {
     //bgsdk.balance(config.bitget.access_key,'390350274889256960').then(console.log);
     //accesskey,account_id,amount,price,symbol,type
     //bgsdk.place(config.bitget.access_key,'390350274889256960','10','0.003','eth_btc','buy-limit');
-    //bgsdk.submitcancel(config.bitget.access_key,'403385175360188416');
-    //bgsdk.order(config.bitget.access_key,'403385175360188416');
-    //bgsdk.matchresults(config.bitget.access_key,'403385175360188416');
+    //bgsdk.submitcancel(config.bitget.access_key,'406368151517835264');
+    // bgsdk.order(config.bitget.access_key,'406368151517835264');
+    // bgsdk.matchresults(config.bitget.access_key,'406368151517835264');
     //symbol,types,start_date,end_date,states,size,fromId,direct)
-    //bgsdk.matchresultsHistory(config.bitget.access_key,'eth_btc','sell-market','2018-06-01','2018-07-20','submitted','50','403041397436887040','next');
-    //bgsdk.orders(config.bitget.access_key,'eth_btc','sell-market','2018-06-01','2018-07-20','submitted','50','','');
+    // bgsdk.matchresultsHistory(config.bitget.access_key,'eth_btc','sell-market','2018-06-01','2018-07-20','submitted','50','','');
+    // bgsdk.orders(config.bitget.access_key,'eth_btc','sell-market','2018-06-01','2018-07-20','submitted','50','','');
     //addressWithdraw,amount,currency,fees
-    //bgsdk.withdrawCreate(config.bitget.access_key,'1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi','10','btc','0.001');
-    //bgsdk.withdrawCancel(config.bitget.access_key,'261');
+    // bgsdk.withdrawCreate(config.bitget.access_key,'1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi','10','btc');
+    // bgsdk.withdrawCancel(config.bitget.access_key,'436');
 
-    bgsdk.withdrawSelect(config.bitget.access_key,'btc','withdraw','10');
+    //bgsdk.withdrawSelect(config.bitget.access_key,'btc','withdraw','10');
+    bgsdk.batchcancel(config.bitget.access_key,'[1,2,3,4]');
 
 
 

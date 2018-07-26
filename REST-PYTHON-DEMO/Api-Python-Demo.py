@@ -111,14 +111,6 @@ class Client_BitGet():
 
     #委单
     def place(self,account_id,amount,types,symbol,price):
-        '''
-            获取多个委托买单或卖单，每次请求返回10条记录
-            side: 可选 buy 1 /sell 0
-            pageIndex:记录页数
-        '''
-        symbol = symbol.lower()
-        if 'usd' in symbol:
-            symbol = symbol.replace('usd','usdt')
         params = {
             'account_id': account_id,
             'amount': amount,
@@ -159,9 +151,6 @@ class Client_BitGet():
 
     #获取用户所有委单
     def getOrders(self,symbol, types, start_date, end_date,states,sizePage):
-        symbol = symbol.lower()
-        if 'usd' in symbol:
-            symbol = symbol.replace('usd','usdt')
         params = {
             'end_date':end_date,
             'method':'getOrders',
@@ -176,9 +165,6 @@ class Client_BitGet():
 
     # 获取用户所有委单
     def orders(self, symbol, types, start_date, end_date, states, sizePage):
-        symbol = symbol.lower()
-        if 'usd' in symbol:
-            symbol = symbol.replace('usd', 'usdt')
         params = {
             'end_date': end_date,
             'method': 'orders',
@@ -194,9 +180,6 @@ class Client_BitGet():
 
     # 提现
     def withdrawCreate(self, address,amount, currency):
-        currency = currency.lower()
-        if 'usd' in currency:
-            currency = currency.replace('usd', 'usdt')
         params = {
             'address':address,
             'amount': amount,
@@ -234,45 +217,30 @@ class Client_BitGet():
 
     #
     def merged(self, currency):
-        currency = currency.lower()
-        if 'usd' in currency:
-            currency = currency.replace('usd', 'usdt')
         params = {'symbol': currency}
         resp = self.signedRequest_Market(path='/market/detail/merged', params=params)
         return resp
 
     #
     def depth(self,currency,type):
-        currency = currency.lower()
-        if 'usd' in currency:
-            currency = currency.replace('usd','usdt')
         params = {'symbol':currency,'type':type}
         resp = self.signedRequest_Market(path='/market/depth', params=params)
         return resp
 
     #
     def trade(self, currency):
-        currency = currency.lower()
-        if 'usd' in currency:
-            currency = currency.replace('usd', 'usdt')
         params = {'symbol': currency}
         resp = self.signedRequest_Market(path='/market/trade', params=params)
         return resp
 
     #
     def trades(self, currency,size):
-        currency = currency.lower()
-        if 'usd' in currency:
-            currency = currency.replace('usd', 'usdt')
         params = {'symbol': currency, 'size':size}
         resp = self.signedRequest_Market(path='/market/history/trade', params=params)
         return resp
 
     #
     def detail(self, currency):
-        currency = currency.lower()
-        if 'usd' in currency:
-            currency = currency.replace('usd', 'usdt')
         params = {'symbol': currency}
         resp = self.signedRequest_Market(path='/market/detail', params=params)
         return resp
@@ -297,9 +265,6 @@ class Client_BitGet():
 
     #k线
     def kline(self, symbol,period, size):
-        symbol = symbol.lower()
-        if 'usd' in symbol:
-            symbol = symbol.replace('usd', 'usdt')
         params = {'symbol': symbol, 'period': period, 'size': size}
         resp = self.signedRequest_Market(path='/market/history/kline', params=params)
         return resp

@@ -1,24 +1,29 @@
 package com.bitget.api;
 
+import com.alibaba.fastjson.JSON;
 import com.bitget.request.*;
 import com.bitget.response.ApiReturnResult;
+import com.bitget.response.OrderList;
+import com.bitget.response.ResDemo;
 import okhttp3.*;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 
 public class ApiDemo {
     private static String encodingCharset = "UTF-8";
 
     private static String domainUrl = "https://api.bitget.com/api/v1";
 
-    private static String accessKey = "ake128d442c0";
-    private static String secretKey = "5373621212c4d4e7b260b9";
+    private static String accessKey = "ake662123c38d442c0";
+    private static String secretKey = "53736212334285922bc4d4e7b260b9";
 
 
     static final int CONN_TIMEOUT = 50;
@@ -31,32 +36,31 @@ public class ApiDemo {
                 .build();
     }
     public static void main(String[] args) throws Exception {
-        withdrawSelect();
     }
     /**
      * 获取个人ID
      */
-
-    public static void accounts(){
-        HashMap<String, Object> paramMap = new LinkedHashMap();
+    @Test
+    public void accounts(){
+        TreeMap<String, Object> paramMap = new TreeMap();
         paramMap.put("method", "accounts");
-        signUp(paramMap,"get");
+        signUpTreeMap(paramMap,"get");
         String method = "/account/accounts?";
-        String s = get(method,paramMap);
+        String s = getTreeMap(method,paramMap);
         System.out.println(s);
     }
 
     /**
      * 获取个人资产
      */
-
-    public static void balance() throws IOException{
-        HashMap<String, Object> paramMap = new LinkedHashMap();
+    @Test
+    public void balance() throws IOException{
+        TreeMap<String, Object> paramMap = new TreeMap();
         paramMap.put("method", "balance");
-        signUp(paramMap,"get");
+        signUpTreeMap(paramMap,"get");
 
         String method = "/accounts/390350274889256960/balance?";
-        String s = get(method,paramMap);
+        String s = getTreeMap(method,paramMap);
         System.out.println(s);
     }
 
@@ -64,34 +68,34 @@ public class ApiDemo {
      * 委单
      * @throws IOException
      */
-
-    public static void place() throws IOException {
-        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
-        paramMap.put("account_id","3903502189256960");
-        paramMap.put("amount","10");
-        paramMap.put("price","0.003");//402631028969091072
+    @Test
+    public void place() throws IOException {
+        TreeMap<String, Object> paramMap = new TreeMap();
+        paramMap.put("account_id","390350274889256960");
+        paramMap.put("amount","1.5");
+        paramMap.put("price","0.9");//402631028969091072
         paramMap.put("method","place");
-        paramMap.put("symbol","iost_eth");
-        paramMap.put("type","sell-limit");
+        paramMap.put("symbol","btc_usdt");
+        paramMap.put("type","buy-limit");
 
-        String signs = signUp(paramMap,"post");
+        String signs = signUpTreeMap(paramMap,"post");
         String method = "/order/orders/place";
         System.out.println(signs);
-        String s = post(method,paramMap,signs);
+        String s = postTreeMap(method,paramMap,signs);
         System.out.println(s);
     }
 
-    //取消委单
-    public static void submitcancel(){
-        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
+    @Test
+    public void submitcancel(){
+        TreeMap<String, Object> paramMap = new TreeMap();
         paramMap.put("method","submitcancel");
-        String signs = signUp(paramMap,"post");
-        String method = "/order/orders/40258159144310784/submitcancel";
-        String s = post(method,paramMap,signs);
+        String signs = signUpTreeMap(paramMap,"post");
+        String method = "/order/orders/406382037843357696/submitcancel";
+        String s = postTreeMap(method,paramMap,signs);
         System.out.println(s);
     }
 
-    private static String post(String method,LinkedHashMap<String, Object> paramMap,String signs){
+    private static String postTreeMap(String method,TreeMap<String, Object> paramMap,String signs){
         try{
             FormBody.Builder formBodyBuilder = new FormBody.Builder();
             for (HashMap.Entry<String, Object> entry : paramMap.entrySet()) {
@@ -113,7 +117,7 @@ public class ApiDemo {
         }
     }
 
-    private static String get(String method,HashMap<String, Object> paramMap){
+    private static String getTreeMap(String method,TreeMap<String, Object> paramMap){
         try{
             Request.Builder builder = new Request.Builder().url(domainUrl + method + serializeComplexSource(paramMap)).get();
             Request request = builder.build();
@@ -125,18 +129,18 @@ public class ApiDemo {
         }
     }
 
-    //批量撤销委单
-    public static void batchcancel(){
+    @Test
+    public  void batchcancel(){
         List list = new ArrayList();
-        list.add("402588740775620608");
-        list.add("40128212342110080");
-        list.add("4012822349185280");
-        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
+        list.add("404473009517146112");
+        list.add("404473006388195328");
+        list.add("404473005377368064");
+        TreeMap<String, Object> paramMap = new TreeMap();
         paramMap.put("method","batchcancel");
         paramMap.put("order_ids", list);
-        String signs = signUp(paramMap,"post");
+        String signs = signUpTreeMap(paramMap,"post");
         String method = "/order/orders/batchcancel";
-        String s = post(method,paramMap,signs);
+        String s = postTreeMap(method,paramMap,signs);
         System.out.println(s);
 
     }
@@ -144,13 +148,13 @@ public class ApiDemo {
      * 查询某个订单详情
      * return
      */
-
-    public static void order() throws IOException{
-        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
+    @Test
+    public void order() throws IOException{
+        TreeMap<String, Object> paramMap = new TreeMap();
         paramMap.put("method","order");
-        String signs = signUp(paramMap,"post");
-        String method = "/order/orders/40263051769176064";
-        String s = post(method,paramMap,signs);
+        String signs = signUpTreeMap(paramMap,"post");
+        String method = "/order/orders/406382037843357696";
+        String s = postTreeMap(method,paramMap,signs);
         System.out.println(s);
 
     }
@@ -158,32 +162,34 @@ public class ApiDemo {
      * 查询某个订单的成交明细
      * return
      */
-    //
-    public static void matchresults(){
-        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
+    @Test
+    public void matchresults(){
+        TreeMap<String, Object> paramMap = new TreeMap();
         paramMap.put("method","orderMatchresults");
-        String signs = signUp(paramMap,"post");
-        String method = "/order/orders/402630547769176064/matchresults";
-        String s = post(method,paramMap,signs);
+        String signs = signUpTreeMap(paramMap,"post");
+        String method = "/order/orders/406382037843357696/matchresults";
+        String s = postTreeMap(method,paramMap,signs);
         System.out.println(s);
     }
 
 
-    //查询历史委单
-    public static void matchresultsHistory(){
-        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
+    @Test
+    public void matchresultsHistory(){
+        TreeMap<String, Object> paramMap = new TreeMap();
         paramMap.put("method","matchresults");
-        paramMap.put("symbol","eth_btc");
-        paramMap.put("types","sell-market");
-        paramMap.put("start_date","2018-06-01");
-        paramMap.put("end_date","2018-07-19");
+        paramMap.put("symbol","iost_eth");
         paramMap.put("states","submitted");
-        paramMap.put("size","50");
-        paramMap.put("from","402954178734895104");
-        paramMap.put("direct","next");
-        String signs = signUp(paramMap,"post");
+        paramMap.put("types","buy-limit");
+        paramMap.put("start_date","2018-06-01");
+        paramMap.put("end_date","2018-07-23");
+
+        paramMap.put("size","10");
+        /*paramMap.put("from","402954178734895104");
+        paramMap.put("direct","next");*/
+        String signs = signUpTreeMap(paramMap,"post");
         String method = "/order/matchresults";
-        String s = post(method,paramMap,signs);
+        String s = postTreeMap(method,paramMap,signs);
+
         System.out.println(s);
     }
 
@@ -193,65 +199,64 @@ public class ApiDemo {
      * 查询当前委托、历史委托
      * return
      */
-
-    public static void orders(){
-        HashMap<String, Object> paramMap = new LinkedHashMap();
+    @Test
+    public void orders(){
+        TreeMap<String, Object> paramMap = new TreeMap();
         paramMap.put("method","orders");
-        paramMap.put("symbol","eth_btc");
         paramMap.put("types","buy-limit");
+        paramMap.put("symbol","iost_eth");
+
         paramMap.put("start_date","2018-06-01");
-        paramMap.put("end_date","2018-07-19");
+        paramMap.put("end_date","2018-07-25");
         paramMap.put("states","submitted");
-        paramMap.put("size","50");
-        paramMap.put("from","401608425894621184");
-        paramMap.put("direct", "next");
-        signUp(paramMap,"get");
+        paramMap.put("size","1000");
+//        paramMap.put("from","403463925435248640");
+//        paramMap.put("direct", "next");
+        signUpTreeMap(paramMap,"get");
         String method = "/order/orders?";
-        String s = get(method,paramMap);
+        String s = getTreeMap(method,paramMap);
         System.out.println(s);
     }
 
-    //提现
-    public static void withdrawCreate(){
-        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
+    @Test
+    public void withdrawCreate(){
+        TreeMap<String, Object> paramMap = new TreeMap();
         paramMap.put("method","withdrawCreate");
         paramMap.put("address","1PaHiYCBFXuotKSSg7ZFGxB4n99CaDNYi");
         paramMap.put("amount","10");
         paramMap.put("currency","btc");
-        String signs = signUp(paramMap,"post");
+        String signs = signUpTreeMap(paramMap,"post");
         String method = "/dw/withdraw/api/create";
-        String s = post(method,paramMap,signs);
+        String s = postTreeMap(method,paramMap,signs);
         System.out.println(s);
     }
 
-    //取消提现
-    public static void withdrawCancel(){
-        LinkedHashMap<String, Object> paramMap = new LinkedHashMap();
+    //191
+    @Test
+    public void withdrawCancel(){
+        TreeMap<String, Object> paramMap = new TreeMap();
         paramMap.put("method", "withdrawCancel");
-        String signs = signUp(paramMap,"post");
-        String method = "/dw/withdraw-virtual/226/cancel";
-        String s = post(method,paramMap,signs);
+        String signs = signUpTreeMap(paramMap,"post");
+        String method = "/dw/withdraw-virtual/344/cancel";
+        String s = postTreeMap(method,paramMap,signs);
         System.out.println(s);
     }
 
-    //查询提现记录
-    public static void withdrawSelect(){
-        HashMap<String, Object> paramMap = new LinkedHashMap();
+    @Test
+    public void withdrawSelect(){
+        TreeMap<String, Object> paramMap = new TreeMap();
         paramMap.put("method","withdrawSelect");
         paramMap.put("currency","btc");
+
+        paramMap.put("size","1");
         paramMap.put("type","withdraw");
-        paramMap.put("size","10");
-        signUp(paramMap,"get");
+        signUpTreeMap(paramMap,"get");
         String method = "/order/deposit_withdraw?";
-        String s = get(method,paramMap);
+        String s = getTreeMap(method,paramMap);
         System.out.println(s);
     }
 
-
-
-
-
-    public static String serializeComplexSource(HashMap<String, Object> params) {
+    public static String serializeComplexSource(TreeMap<String, Object> params) {
         StringBuffer rc = new StringBuffer(2048);
         for (Map.Entry<String, Object> entry : params.entrySet()) {
             Object value = entry.getValue();
@@ -276,10 +281,10 @@ public class ApiDemo {
         return rc.toString();
     }
 
-    private static String signUp(HashMap paramMap,String methodReq) {
+    private static String signUpTreeMap(TreeMap paramMap,String methodReq) {
         try {
             //先进行数据的转换
-            String params = signUpParam(paramMap);
+            String params = signUpParamTree(paramMap);
             //通过sha对secretKey进行加密
             String secret = digest(secretKey);
             //在将要加密的数据和加密后的secretKey进行hmac加密
@@ -306,13 +311,6 @@ public class ApiDemo {
 
     }
 
-    public static String signUpParam(HashMap<String, Object> paramMap) {
-        StringBuilder sb = new StringBuilder();
-        for (String key : paramMap.keySet()) {
-            sb.append(key).append("=").append(paramMap.get(key)).append("&");
-        }
-        return sb.substring(0, sb.length() - 1);
-    }
     public static String signUpParamTree(TreeMap<String, Object> paramMap) {
         StringBuilder sb = new StringBuilder();
         for (String key : paramMap.keySet()) {

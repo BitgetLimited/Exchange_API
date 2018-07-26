@@ -5,7 +5,7 @@ var Promise = require('bluebird');
 var http = require('../framework/httpClient');
 var crypto = require('crypto');
 
-const URL_BITGET_PRO = 'api.bitget.com';
+const URL_BITGET_PRO = 'https://api.bitget.com';
 
 const DEFAULT_HEADERS = {
     "Content-Type": "application/json",
@@ -21,7 +21,7 @@ function get_auth() {
     return ret;
 }
 
-function sign_sha(p) {
+function sign_sha(signParam) {
     //var p = require('querystring').stringify(data);
     //加密dercretkey
     var secretkeySHA = encodeURIComponent(CryptoJS.SHA1(config.bitget.secretkey));
@@ -45,12 +45,12 @@ function sign_sha(p) {
 
 
     var key1 = Buffer(secretkeySHA.length)
-    var data1 = Buffer(p.length)
+    var data1 = Buffer(signParam.length)
     for(var i = 0;i<secretkeySHA.length;i++){
         key1[i] = secretkeySHA[i].charCodeAt();
     }
-    for(var i = 0;i<p.length;i++){
-        data1[i] = p[i].charCodeAt();
+    for(var i = 0;i<signParam.length;i++){
+        data1[i] = signParam[i].charCodeAt();
     }
 
     var md5 = crypto.createHash('md5');
@@ -62,6 +62,17 @@ function sign_sha(p) {
     md5.update(md, 0, 16);
     md = md5.digest('hex');
     return md;
+}
+
+function signSort(body){
+    let keys = Object.keys(body);
+    keys.sort();
+    let str = '';
+    for(let i of keys){
+        str += i + '=' + body[i] + '&';
+    }
+    var signParams = str.slice(0,-1);
+    return signParams;
 }
 
 function call_api(url) {
@@ -100,20 +111,22 @@ var BITGET_PRO = {
     accounts: function(accesskey){
         var path = '/api/v1/account/accounts';
         var body = {'method':'accounts'};
-        var p = require('querystring').stringify(body);
-        var payload = sign_sha(p);
+        //var p = require('querystring').stringify(body);
+        var signParam = signSort(body);
+        var payload = sign_sha(signParam);
         var longtime = Date.now();
-        var url = 'http://'+URL_BITGET_PRO+path+"?"+p+"&accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
+        var url = URL_BITGET_PRO+path+"?"+signParam+"&accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
         return call_api(url);
 
     },
     balance: function(accesskey,id){
         var path = '/api/v1/accounts/'+id+'/balance';
         var body = {'method':'balance'};
-        var p = require('querystring').stringify(body);
-        var payload = sign_sha(p);
+        //var p = require('querystring').stringify(body);
+        var signParam = signSort(body);
+        var payload = sign_sha(signParam);
         var longtime = Date.now();
-        var url = 'http://'+URL_BITGET_PRO+path+"?"+body+"&accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
+        var url = URL_BITGET_PRO+path+"?"+signParam+"&accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
         return call_api(url);
 
     },
@@ -122,18 +135,19 @@ var BITGET_PRO = {
         var body = {
           'method':'place',
           'account_id':account_id,
-          'amount':amount,
-          'symbol':symbol,
           'type':type,
+          'amount':amount,
+            'symbol':symbol,
         }
         if(price){
             body['price'] = price;
         }
-        var p = require('querystring').stringify(body);
-        var payload = sign_sha(p);
+        // var p = require('querystring').stringify(body);
+        // console.log("p="+p)
+        var signParam = signSort(body);
+        var payload = sign_sha(signParam);
         var longtime = Date.now();
-        console.log(payload);
-        var url = 'http://'+URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
+        var url = URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
         return call_api_post(url,body);
 
     },
@@ -142,10 +156,25 @@ var BITGET_PRO = {
         var body = {
           'method':'submitcancel'
         }
-        var p = require('querystring').stringify(body);
-        var payload = sign_sha(p);
+        //var p = require('querystring').stringify(body);
+        var signParam = signSort(body);
+        var payload = sign_sha(signParam);
         var longtime = Date.now();
-        var url = 'http://'+URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
+        var url = URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
+        return call_api_post(url,body);
+
+    },
+    batchcancel: function(accesskey,order_ids){
+        var path = '/api/v1/order/orders/batchcancel';
+        var body = {
+          'method':'batchcancel',
+          'order_ids':order_ids
+        }
+        //var p = require('querystring').stringify(body);
+        var signParam = signSort(body);
+        var payload = sign_sha(signParam);
+        var longtime = Date.now();
+        var url = URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
         return call_api_post(url,body);
 
     },
@@ -154,10 +183,11 @@ var BITGET_PRO = {
         var body = {
           'method':'order'
         }
-        var p = require('querystring').stringify(body);
-        var payload = sign_sha(p);
+        //var p = require('querystring').stringify(body);
+        var signParam = signSort(body);
+        var payload = sign_sha(signParam);
         var longtime = Date.now();
-        var url = 'http://'+URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
+        var url = URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
         return call_api_post(url,body);
 
     },
@@ -166,11 +196,13 @@ var BITGET_PRO = {
         var body = {
           'method':'orderMatchresults'
         }
-        var p = require('querystring').stringify(body);
-        var payload = sign_sha(p);
+        //var p = require('querystring').stringify(body);
+        var signParam = signSort(body);
+        var payload = sign_sha(signParam);
         var longtime = Date.now();
-        var url = 'http://'+URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
+        var url = URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
         return call_api_post(url,body);
+
 
     },
     matchresultsHistory: function(accesskey,symbol,types,start_date,end_date,states,size,fromId,direct){
@@ -192,10 +224,11 @@ var BITGET_PRO = {
                 return false;
             }
         }
-        var p = require('querystring').stringify(body);
-        var payload = sign_sha(p);
+        //var p = require('querystring').stringify(body);
+        var signParam = signSort(body);
+        var payload = sign_sha(signParam);
         var longtime = Date.now();
-        var url = 'http://'+URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
+        var url = URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
         return call_api_post(url,body);
 
     },
@@ -218,10 +251,11 @@ var BITGET_PRO = {
                 return false;
             }
         }
-        var p = require('querystring').stringify(body);
-        var payload = sign_sha(p);
+        //var p = require('querystring').stringify(body);
+        var signParam = signSort(body);
+        var payload = sign_sha(signParam);
         var longtime = Date.now();
-        var url = 'http://'+URL_BITGET_PRO+path+"?"+p+"&accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
+        var url = URL_BITGET_PRO+path+"?"+signParam+"&accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
         return call_api(url);
 
     },
@@ -233,10 +267,11 @@ var BITGET_PRO = {
           'amount':amount,
           'currency':currency
         }
-        var p = require('querystring').stringify(body);
-        var payload = sign_sha(p);
+        //var p = require('querystring').stringify(body);
+        var signParam = signSort(body);
+        var payload = sign_sha(signParam);
         var longtime = Date.now();
-        var url = 'http://'+URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
+        var url = URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
         return call_api_post(url,body);
 
     },
@@ -245,10 +280,11 @@ var BITGET_PRO = {
         var body = {
           'method':'withdrawCancel'
         }
-        var p = require('querystring').stringify(body);
-        var payload = sign_sha(p);
+        //var p = require('querystring').stringify(body);
+        var signParam = signSort(body);
+        var payload = sign_sha(signParam);
         var longtime = Date.now();
-        var url = 'http://'+URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
+        var url = URL_BITGET_PRO+path+"?accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
         return call_api_post(url,body);
 
     },
@@ -260,10 +296,11 @@ var BITGET_PRO = {
           'type':type,
           'size':size
         }
-        var p = require('querystring').stringify(body);
-        var payload = sign_sha(p);
+        //var p = require('querystring').stringify(body);
+        var signParam = signSort(body);
+        var payload = sign_sha(signParam);
         var longtime = Date.now();
-        var url = 'http://'+URL_BITGET_PRO+path+"?"+p+"&accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
+        var url = URL_BITGET_PRO+path+"?"+signParam+"&accesskey="+accesskey+"&sign="+payload+"&req_time="+longtime;
         return call_api(url);
 
     },
@@ -271,65 +308,65 @@ var BITGET_PRO = {
     ticker: function(currency) {
         var path = '/data/v2/ticker';
         var body = "method=ticker&currency="+currency;
-        var url = 'http://'+URL_BITGET_PRO+path+"?"+body;
+        var url = URL_BITGET_PRO+path+"?"+body;
         return call_api(url);
     },
     depth: function(currency,type) {
         var path = '/data/v1/market/depth';
         var body = "method=depth&symbol="+currency+"&type="+type;
-        var url = 'http://'+URL_BITGET_PRO+path+"?"+body;
+        var url = URL_BITGET_PRO+path+"?"+body;
         return call_api(url);
     },
     trades: function(currency,size) {
         var path = '/data/v1/market/history/trade';
         var body = "method=trades&symbol="+currency+"&size="+size;
-        var url = 'http://'+URL_BITGET_PRO+path+"?"+body;
+        var url = URL_BITGET_PRO+path+"?"+body;
         return call_api(url);
     },
     trade: function(currency) {
         var path = '/data/v1/market/trade';
         var body = "method=trade&symbol="+currency;
-        var url = 'http://'+URL_BITGET_PRO+path+"?"+body;
+        var url = URL_BITGET_PRO+path+"?"+body;
         return call_api(url);
     },
     //k线
     kline: function(currency,type,size) {
         var path = '/data/v1/market/history/kline';
         var body = "method=kline&symbol="+currency+"&period="+type+"&size="+size;
-        var url = 'http://'+URL_BITGET_PRO+path+"?"+body;
+        var url = URL_BITGET_PRO+path+"?"+body;
         return call_api(url);
     },
 
     merged: function(currency) {
         var path = '/data/v1/market/detail/merged';
         var body = "method=merged&symbol="+currency;
-        var url = 'http://'+URL_BITGET_PRO+path+"?"+body;
+        var url = URL_BITGET_PRO+path+"?"+body;
         return call_api(url);
     },
     tickers: function() {
         var path = '/data/v1/market/tickers';
-        var url = 'http://'+URL_BITGET_PRO+path;
+        var url = URL_BITGET_PRO+path;
         return call_api(url);
     },
     detail: function(currency) {
         var path = '/data/v1/market/detail';
         var body = "symbol="+currency;
-        var url = 'http://'+URL_BITGET_PRO+path+'?'+body;
+        var url = URL_BITGET_PRO+path+'?'+body;
         return call_api(url);
     },
     symbols: function() {
         var path = '/data/v1/common/symbols';
-        var url = 'http://'+URL_BITGET_PRO+path;
+        var url = URL_BITGET_PRO+path;
         return call_api(url);
     },
     currencys: function() {
         var path = '/data/v1/common/currencys';
-        var url = 'http://'+URL_BITGET_PRO+path;
+        var url = URL_BITGET_PRO+path;
         return call_api(url);
     },
     timestamp: function() {
         var path = '/data/v1/common/timestamp';
-        var url = 'http://'+URL_BITGET_PRO+path;
+        var url = URL_BITGET_PRO+path;
         return call_api(url);
     }
 }
