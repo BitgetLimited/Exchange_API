@@ -99,8 +99,10 @@ public class ApiContractDemo {
      */
     public static String getHistoryRate() {
         String productCode = "btcusd";
+        // from 和 to决定查询起始页
         Integer from = 15;
         Integer to = 1;
+        // 最多查100
         Integer limit = 100;
         String s = HttpUtil.syncGetString(baseUrl + "/api/swap/v1/instruments/" + productCode + "/historical_funding_rate?from=" + 2.7 + "&to=" + to + "&limit=" + limit);
         return s;
@@ -111,8 +113,8 @@ public class ApiContractDemo {
      */
     public static String getKLine() {
         String productCode = "btcusd";
+        // start和end是查询起始时间转换成国标时间后的时间，格式为(必须是ISO8601格式的时间)：yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
         String start = getTimeStamp("2019-04-12 12:12:12");
-        System.out.println(start);
         String end = getTimeStamp("2019-04-18 12:12:12");
         /**
          *                 ONE_MINUTE("1", 60),
@@ -126,6 +128,7 @@ public class ApiContractDemo {
          *                 SEVEN_DAY("7*24*60", 604800);
          *                 这些是granularity取值
          */
+        // 查询粒度
         Integer granularity = 60;
         String s = HttpUtil.syncGetString(baseUrl + "/api/swap/v1/instruments/" + productCode + "/candles?start=" + start + "&end=" + end + "&granularity=" + granularity);
         return s;
@@ -162,6 +165,7 @@ public class ApiContractDemo {
      */
     public static String getTrades() {
         String productCode = "btcusd";
+        // 最大为100
         Integer limit = 12;
         String s = HttpUtil.syncGetString(baseUrl + "/api/swap/v1/instruments/" + productCode + "/trades?limit=" + limit);
         return s;
@@ -212,7 +216,6 @@ public class ApiContractDemo {
      * @return
      */
     static String getAllProductPosition() {
-        //String s = HttpUtil.syncGetString(baseUrl + "api/swap/v1/position");
         String allProductPosition = bitgitSwapClient.getAllProductPosition();
 
         return allProductPosition;
@@ -225,7 +228,6 @@ public class ApiContractDemo {
      */
     static String getProductPosition() {
         String productCode = "btcusd";
-//        String s = HttpUtil.syncGetString(baseUrl + "api/swap/v1/" + productCode + "/position");
         String position = bitgitSwapClient.getPosition(productCode);
         return position;
     }
@@ -291,7 +293,7 @@ public class ApiContractDemo {
         // from 和to 主要是查第几页的数据
         Integer from = 1;
         Integer to = 2;
-        // 每页显示多少数据
+        // 每页显示多少数据，最大为100
         Integer limit = 3;
         String result = bitgitSwapClient.getLedger(productCode, from, to, limit);
         return result;
@@ -305,7 +307,7 @@ public class ApiContractDemo {
         // from 和to 主要是查第几页的数据
         Integer from = null;
         Integer to = 2;
-        // 每页显示多少数据
+        // 每页显示多少数据，最大为100
         Integer limit = 3;
         String result = bitgitSwapClient.getLedgerMargin(productCode, from, to, limit);
 
