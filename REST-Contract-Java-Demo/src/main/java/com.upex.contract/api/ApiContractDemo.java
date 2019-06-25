@@ -77,10 +77,39 @@ public class ApiContractDemo {
 //        result = getFills();
 //        // TODO 获取合约挂单冻结数量
 //  result = getHolds();
+        // TODO 调整保证金
+//        result = adjustMargin();
 
         System.out.println(result);
     }
+    /**
+     * 调整保证金
+     *
+     * @return
+     */
+    private static String adjustMargin() {
+        /**
+         * 数量
+         */
+        String amount = "0.001";
+        /**
+         * 产品编码
+         */
+        String productCode = "btcusd";
 
+        /**
+         * 方向0多仓 1空仓
+         */
+        Integer positionType = 1;
+
+        /**
+         * 类型1增加 2减少
+         */
+        Integer type = 2;
+        String result = bitgitSwapClient.adjustMargin(productCode, amount, positionType, type);
+
+        return result;
+    }
     /**
      * 获取深度
      *

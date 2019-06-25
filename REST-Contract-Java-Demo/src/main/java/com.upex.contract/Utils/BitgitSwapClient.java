@@ -886,4 +886,32 @@ public class BitgitSwapClient {
         }
         return sb.length() <= 0 ? sb.toString() : sb.substring(0, sb.length() - 1);
     }
+
+    public String adjustMargin(String productCode, String amount, Integer positionType, Integer type) {
+        String method = null, res = null;
+        TreeMap<String, Object> paramMap = new TreeMap<>();
+        try {
+            paramMap.put("method", "adjustMargin");
+            paramMap.put("amount",amount);
+            paramMap.put("positionType",positionType);
+            paramMap.put("type",type);
+            signUpTreeMap(paramMap, "get");
+            method = "/api/swap/v1/"+productCode+"/adjustMargin?";
+            res = getTreeMap(method, paramMap);
+
+            JSONObject jsonObject = JSON.parseObject(res);
+            String status = jsonObject.getString("status");
+            if (!"ok".equalsIgnoreCase(status)) {
+                logger.warn("bitgitSwap getPosition error accountId={}, accessKey={}, method={}, res={}",
+                        accountId, accessKey, method, res);
+                return null;
+            }
+            String resData = jsonObject.getString("data");
+            return resData;
+        }catch (Exception e){
+            logger.error("bitgitSwap getPosition error accountId={}, accessKey={}, paramMap={}, method={}, res={}, e={}",
+                    accountId, accessKey, paramMap.toString(), method, res, e.getMessage(), e);
+        }
+        return null;
+    }
 }
