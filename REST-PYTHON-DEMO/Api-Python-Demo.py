@@ -57,7 +57,8 @@ class Client_BitGet():
     def signedRequest_Trade(self, path, params, reqMethod):
         print(params)
         param = ''
-        for key in params.keys():
+        keys = sorted(params.keys())
+        for key in keys:
             param += key + '=' + str(params.get(key)) + '&'
         param = param.rstrip('&')
         print("param="+param)
