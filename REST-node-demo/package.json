@@ -1,16 +1,16 @@
 {
   "name": "bitget",
   "version": "1.0.0",
-  "description": ""
+  "description": "",
   "scripts": {
     "start": "ENV=dev ./node_modules/.bin/nodemon --harmony test.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "exec": "node demo_sdk.js"
   },
   "author": "linfeng.dong",
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.3.1",
-    "config": "^1.28.1",
     "crypto-js": "^3.1.9-1",
     "moment": "^2.13.0",
     "pako": "^1.0.6",

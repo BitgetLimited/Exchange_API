@@ -1,11 +1,13 @@
 
-var config = require('config');
+var config = require('../config/default');
 var CryptoJS = require('crypto-js');
 var Promise = require('bluebird');
 var http = require('../framework/httpClient');
 var crypto = require('crypto');
 
 const URL_BITGET_PRO = 'https://api.bitget.com';
+
+//const URL_BITGET_PRO = 'https://capi.bitget.com';
 
 const DEFAULT_HEADERS = {
     "Content-Type": "application/json",

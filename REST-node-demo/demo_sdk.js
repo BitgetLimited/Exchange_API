@@ -1,9 +1,9 @@
-var config = require('config');
+var config = require('./config/default');
 const bgsdk = require('./sdk/bgsdk');
 
 function run() {
 
-    //bgsdk.accounts(config.bitget.access_key).then(console.log);
+    bgsdk.accounts(config.bitget.access_key).then(console.log);
     //bgsdk.balance(config.bitget.access_key,'390350274889256960').then(console.log);
     //accesskey,account_id,amount,price,symbol,type
     //bgsdk.place(config.bitget.access_key,'390350274889256960','10','0.003','eth_btc','buy-limit');
