@@ -1,15 +1,11 @@
 package com.bitget.api;
 
-import com.alibaba.fastjson.JSON;
 import com.bitget.request.*;
 import com.bitget.response.ApiReturnResult;
-import com.bitget.response.OrderList;
-import com.bitget.response.ResDemo;
 import okhttp3.*;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
